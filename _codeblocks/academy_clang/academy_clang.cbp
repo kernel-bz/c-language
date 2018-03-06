@@ -1,0 +1,601 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="academy_clang" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/academy_clang" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/academy_clang" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="../../ch01_intro/ch0101_hello.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch01_intro/ch0101_hello01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch01_intro/ch0101_hello02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch01_intro/ch0102_loop01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch01_intro/ch0102_loop02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch01_intro/ch0102_loop03.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch01_intro/ch0102_var01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch01_intro/ch0102_var02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch01_intro/ch0103_char_io01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch01_intro/ch0103_char_io02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch01_intro/ch0103_char_io03.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch01_intro/ch0103_char_io04.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch01_intro/ch0103_char_io05.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch01_intro/ch0103_for.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch01_intro/ch0104_char_count.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch01_intro/ch0104_symbol.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch01_intro/ch010501_copy.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch01_intro/ch010502_char01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch01_intro/ch010502_char02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch01_intro/ch010503_line.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch01_intro/ch010504_word.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch01_intro/ch0105_function.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch01_intro/ch0105_io.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch01_intro/ch0106_arr.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch01_intro/ch0107_fn.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch01_intro/ch0109_arr.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch01_intro/ch0110_scope.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch02_type/ch0200temp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch02_type/ch0201_var01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch02_type/ch0201_var02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch02_type/ch0201_var03.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch02_type/ch0202_type01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch02_type/ch0202_type02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch02_type/ch0202_type03.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch02_type/ch0203_const01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch02_type/ch0203_const02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch02_type/ch0203_const03.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch02_type/ch0203_const04.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch02_type/ch0204_dec01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch02_type/ch0205_arith01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch02_type/ch0206_rel01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch02_type/ch0207_conv01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch02_type/ch0207_conv02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch02_type/ch0207_conv03.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch02_type/ch0208_inc01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch02_type/ch0209_bit01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch02_type/ch0210_ass01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch02_type/ch0211_cond01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch02_type/ch0212_seq01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch02_type/ch0213_logic.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch03_flow/ch0301_block01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch03_flow/ch0302_ifelse01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch03_flow/ch0303_elseif01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch03_flow/ch0303_elseif02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch03_flow/ch0304_switch01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch03_flow/ch0304_switch02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch03_flow/ch0305_while_for01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch03_flow/ch0305_while_for02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch03_flow/ch0306_do_while01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch03_flow/ch0306_do_while02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch03_flow/ch0307_break_continue01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch03_flow/ch0308_goto01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch04_fn/ch0401_basic01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch04_fn/ch0401_basic02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch04_fn/ch0402_basic03.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch04_fn/ch0403_external01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch04_fn/ch0403_external02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch04_fn/ch0404_scope01/main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch04_fn/ch0404_scope01/module1.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch04_fn/ch0404_scope01/module2.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch04_fn/ch0405_header01/ch0405.h" />
+		<Unit filename="../../ch04_fn/ch0405_header01/main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch04_fn/ch0405_header01/module1.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch04_fn/ch0405_header01/module2.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch04_fn/ch0405_header02/calc.h" />
+		<Unit filename="../../ch04_fn/ch0405_header02/getch.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch04_fn/ch0405_header02/gettop.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch04_fn/ch0405_header02/main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch04_fn/ch0405_header02/stack.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch04_fn/ch0406_static01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch04_fn/ch0406_static02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch04_fn/ch0407_register01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch04_fn/ch0408_block01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch04_fn/ch0408_block02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch04_fn/ch0409_init01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch04_fn/ch0410_recur01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch04_fn/ch0410_recur02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch04_fn/ch0411_mac01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch04_fn/ch0411_mac02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch05_ptr/ch0501_ptr01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch05_ptr/ch0501_ptr02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch05_ptr/ch0502_param01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch05_ptr/ch0503_array01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch05_ptr/ch0503_array02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch05_ptr/ch0504_ptr_arith00.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch05_ptr/ch0504_ptr_arith01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch05_ptr/ch0504_ptr_arith02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch05_ptr/ch0505_str01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch05_ptr/ch0505_str02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch05_ptr/ch0505_str03.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch05_ptr/ch0505_str03.s" />
+		<Unit filename="../../ch05_ptr/ch0506_ptr_array01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch05_ptr/ch0506_ptr_array02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch05_ptr/ch0507_multi_array01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch05_ptr/ch0508_ptr_array_init01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch05_ptr/ch0509_parray01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch05_ptr/ch0510_cmd_line01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch05_ptr/ch0511_fn_ptr01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch05_ptr/ch0511_fn_ptr02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch05_ptr/ch0512_complex01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch05_ptr/ch0512_complex02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch05_ptr/ch0512_complex03.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch05_ptr/ch0512_complex04.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch05_ptr/ch0599_array_temp01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch05_ptr/ch0599_temp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch06_struct/ch0601_basic01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch06_struct/ch0601_basic02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch06_struct/ch0602_struct_fn01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch06_struct/ch0602_struct_fn02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch06_struct/ch0602_struct_fn03.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch06_struct/ch0603_arr01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch06_struct/ch0603_arr02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch06_struct/ch0604_struct_ptr01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch06_struct/ch0605_bst/bst.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch06_struct/ch0605_bst/bst.h" />
+		<Unit filename="../../ch06_struct/ch0605_bst/main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch06_struct/ch0605_bst/mem.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch06_struct/ch0605_bst/mem.h" />
+		<Unit filename="../../ch06_struct/ch0605_typedef01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch06_struct/ch0605_typedef02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch06_struct/ch0606_union01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch06_struct/ch0607_struct_bit01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch06_struct/ch0608_padding01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch06_struct/ch0608_struct.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch06_struct/ch0608_union.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch06_struct/ch0608_union.s" />
+		<Unit filename="../../ch06_struct/ch0699_temp01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch07_intro/fibonacci.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch07_intro/function_pointer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch07_intro/gcd.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch07_intro/loop.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch07_intro/pointer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch07_intro/recursion.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch08_sort/bubble_sort.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch08_sort/counting_sort.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch08_sort/heap.txt" />
+		<Unit filename="../../ch08_sort/heap_sort.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch08_sort/insertion_dual.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch08_sort/insertion_sort.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch08_sort/library_sort.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch08_sort/merge_sort.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch08_sort/quick_sort.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch08_sort/quick_sort.txt" />
+		<Unit filename="../../ch08_sort/quick_sort2.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch08_sort/quick_sort_random.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch08_sort/shell_sort.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch08_sort/sortings.txt" />
+		<Unit filename="../../ch09_stack/main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch09_stack/stack.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch09_stack/stack.h" />
+		<Unit filename="../../ch10_queue/main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch10_queue/queue.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch10_queue/queue.h" />
+		<Unit filename="../../ch11_list/eng_kor_dic.dat" />
+		<Unit filename="../../ch11_list/list.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch11_list/list.h" />
+		<Unit filename="../../ch11_list/main_dic.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch12_hashing/hash.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch12_hashing/hash.txt" />
+		<Unit filename="../../ch13_tree/BST1/bst.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch13_tree/BST1/bst.h" />
+		<Unit filename="../../ch13_tree/BST1/main_bst_int.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch13_tree/BST1/main_bst_word.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch13_tree/BST2/binary_search_tree.txt" />
+		<Unit filename="../../ch13_tree/BST2/bst.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch13_tree/BST2/bst.h" />
+		<Unit filename="../../ch13_tree/BST2/main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch13_tree/RBT/main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch13_tree/RBT/rbt.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ch13_tree/RBT/rbt.h" />
+		<Unit filename="../../ch13_tree/RBT/red_black_tree.txt" />
+		<Unit filename="../../example/Makefile" />
+		<Unit filename="../../example/README" />
+		<Unit filename="../../example/arch.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../example/include/arch.h" />
+		<Unit filename="../../example/include/config.h" />
+		<Unit filename="../../example/include/list.h" />
+		<Unit filename="../../example/include/mem.h" />
+		<Unit filename="../../example/include/stdio.h" />
+		<Unit filename="../../example/include/thread.h" />
+		<Unit filename="../../example/list01/list01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../example/list02/list01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../example/list02/list01.h" />
+		<Unit filename="../../example/list02/list02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../example/list03/list01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../example/list03/list01.h" />
+		<Unit filename="../../example/list03/list02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../example/list04/list01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../example/list04/list01.h" />
+		<Unit filename="../../example/list04/list02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../example/list05/list01.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../example/list05/list01.h" />
+		<Unit filename="../../example/list05/list02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../example/main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../example/mem.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../example/os.lds" />
+		<Unit filename="../../example/start.S" />
+		<Unit filename="../../example/stdio.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../example/thread.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

@@ -1,0 +1,2704 @@
+
+http://homepages.ihug.co.nz/~aurora76/Malc/Sorting_Array.htm
+
+Array Sorting
+by Malcolm Phillips
+
+< Back to Sorting
+
+ Exchanging Sort Techniques 
+ Selection Sort Techniques 
+ Insertion Sort Techniques 
+ Merge Sort Techniques 
+ Tree Sort Techniques 
+ Heap Sort Techniques 
+ Quick Sort Techniques 
+ Oddball Techniques 
+ Non-Comparison-Based Sort Techniques 
+ Unfeasible Sort Techniques 
+Okay, let's assume that you're going to be doing internal, sequential sorting, in place, on an array. There are tons of algorithms to choose from, and although many of them are faster than others in general, for most sorting algorithms there does exist a situation where a particular algorithm is a better choice than any other. First of all, many of the algorithms below make use of ¡°Swap¡±. This can be a function or a macro, whose sole purpose is to swap two items from anywhere in memory.
+One such definition for this is:
+[show source code]
+[hide source code]
+template <class T> inline void Swap(T &i1, T &i2) {
+    const T i3(i1);
+    i1 = i2;
+    i2 = i3;
+}
+I'll also present a few other necessary odds and ends used by some algorithms:
+[show source code]
+[hide source code]
+template <class T>
+bool Sorted(const T a[], int n) {
+    //if any item is less than its predecessor then return false
+    for (int i = n-1; i > 0; --i)
+        if (a[i] < a[i-1])
+            return false;
+    return true;
+}
+
+template <class T>
+void Reverse(T a[], int n) {
+    T *l = &a[0], *r = &a[n-1];
+    while (l < r) {
+        Swap(*l, *r);
+        ++l; --r;
+    }
+}
+
+// O(n) : Randomises the order within the array
+template <class T>
+void Shuffle(T a[], int n, long seed=DEFAULT_SEED) {
+    long holdrand = seed;
+    while (n > 0) {
+        //generate a random number (local generator)
+        unsigned int randNo = (((holdrand = holdrand * 214013L + 2531011L) >> 16) & 0x7fff);
+        const int pos = randNo % n;
+        --n;
+        if (pos != n) Swap(a[pos], a[n]);
+    }
+}
+Exchanging Sort Techniques
+Bubble Sort:
+
+
+Probably the most well-known sorting algorithm is bubble-sort. In bubble sort, the values float one at a time to the end of the array, slowly moving one item into position each pass. The code consists of two loops, a compare, and a swap (of adjacent items). Bubble Sort is stable because it only ever swaps adjacent items, and only if the first one is strictly greater than the second one. Sometimes people implement Simple Sort, thinking they have actually implemented Bubble Sort, but if it doesn't always compare adjacent items, it isn't Bubble Sort. Depending on the order of the for-loops this is sometimes called Sink Sort.
+
+Example with random numbers:
+    Initial list: 17, 37, 48, 29, 13, 42, 50, 4, 63
+First outer loop pass (swaps in red, comparisons not resulting a swap are omitted):
+    Swap: 17, 37, 29, 48, 13, 42, 50, 4, 63
+    Swap: 17, 37, 29, 13, 48, 42, 50, 4, 63
+    Swap: 17, 37, 29, 13, 42, 48, 50, 4, 63
+    Swap: 17, 37, 29, 13, 42, 48, 4, 50, 63
+Second outer loop pass:
+    Swap: 17, 29, 37, 13, 42, 48, 4, 50, 63
+    Swap: 17, 29, 13, 37, 42, 48, 4, 50, 63
+    Swap: 17, 29, 13, 37, 42, 4, 48, 50, 63
+Third outer loop pass:
+    Swap: 17, 13, 29, 37, 42, 4, 48, 50, 63
+    Swap: 17, 13, 29, 37, 4, 42, 48, 50, 63
+Fourth outer loop pass:
+    Swap: 13, 17, 29, 37, 4, 42, 48, 50, 63
+    Swap: 13, 17, 29, 4, 37, 42, 48, 50, 63
+Fifth outer loop pass:
+    Swap: 13, 17, 4, 29, 37, 42, 48, 50, 63
+Sixth outer loop pass:
+    Swap: 13, 4, 17, 29, 37, 42, 48, 50, 63
+Seventh outer loop pass:
+    Swap: 4, 13, 17, 29, 37, 42, 48, 50, 63
+As you can see, some items take a long time to reach their destination (like the 4 above) because they can only move one position for each outer loop pass. These are called turtles, and are the main speed problem with Bubble Sort. Items moving in the other direction move fast (like 48 above) and are called hares.
+
+[show source code]
+[hide source code]
+template <class T>
+void BubbleSort(T a[], int n) {
+    for (int i = n-1; i > 0; --i) {
+        for (int j = 0; j < i; ++j) {
+            if (a[j + 1] < a[j])
+                Swap(a[j], a[j + 1]);
+        }
+    }
+}
+
+http://en.wikipedia.org/wiki/Bubble_sort
+http://www.nist.gov/dads/HTML/bubblesort.html
+
+Improved Bubble Sort:
+Bubble sort can be improved by keeping track of whether or not a swap is made on each inner loop pass, and if not, then the sorting is completed. This means adding a set, a clear, and a test of a flag variable to the code. Now, if the array is already sorted or nearly sorted, then the inner loop only runs once, or only a few times. Improved Bubble Sort is still stable as it still only swaps adjacent items and only if the first one is strictly greater than the second one.
+
+[show source code]
+[hide source code]
+template <class T>
+
+void ImprovedBubbleSort(T a[], int n) {
+    for (int i = n-1; i > 0; --i) {
+        bool swapped = false;
+        for (int j = 0; j < i; ++j) {
+            if (a[j + 1] < a[j]) {
+                Swap(a[j], a[j + 1]);
+                swapped = true;
+            }
+        }
+        if (!swapped) break;
+    }
+}
+
+http://www.sorting-algorithms.com/bubble-sort
+
+Best Bubble Sort:
+The improvement to Bubble Sort above can be taken further. After each pass we have moved the highest misplaced item to its correct spot. This means that further bubbles will never need to be bubbled up past this point. If that point is the first item in the array, then we are done. So this acts much like the first improved version, but is even better if the last few items are already in position.
+Again, this is still Bubble Sort, and so is stable.
+
+[show source code]
+[hide source code]
+template <class T, class Size>
+void BestBubbleSort(T a[], Size n) {
+    Size i = n-1;
+    do {
+        Size k = 0;
+        for (Size j = 0; j < i; ++j) {
+            if (a[j + 1] < a[j]) {
+                Swap(a[j], a[j + 1]);
+                k = j;
+            }
+        }
+        i = k;
+    } while (i > 0);
+}
+
+Simple Sort:
+Perhaps the easiest algorithm to implement is simple sort. In simple sort, the code consists of two loops that compare every item to every other item, and a swap if they are out of order. The inner loop can either start just after the outer loop, or an extra test can be added to check that the inner loop position is greater than the outer one.
+Unlike Bubble Sort, this algorithm is NOT stable.
+
+[show source code]
+[hide source code]
+template <class T>
+void SimpleSort(T a[], int n) {
+    for (int i = 0; i < n; ++i)
+        for (int j = i+1; j < n; ++j)
+            if (a[j] < a[i])
+                Swap(a[j], a[i]);
+}
+http://www.sortieralgorithmen.de/simplesort/index.html
+
+Shaker Sort:
+
+
+There are some algorithms based on Bubble Sort, which improve the algorithm somewhat. For example Shaker Sort, which performs Bubble Sort, passes in alternating directions. The alternating passes mean many items repeatedly move back and forth from one spot, to the next spot over, and then back to the first spot, giving a noticeable shaking effect if animated. This allows both small and large items to move towards their destination, as the algorithm progresses.
+Shaker Sort is stable.
+
+[show source code]
+[hide source code]
+template <class T>
+void ShakerSort(T a[], int n) {
+    int j, l = 1, r = n-1, k = r;
+    do {
+        //move smallest towards bottom
+        for (j = r; j >= l; --j)
+            if (a[j] < a[j - 1]) {
+                Swap(a[j - 1], a[j]);
+                k = j;
+            }
+        l = k + 1;
+        //move largest towards top
+        for (j = l; j <= r; ++j)
+            if (a[j] < a[j - 1]) {
+                Swap(a[j - 1], a[j]);
+                k = j;
+            }
+        r = k - 1;
+    } while (l <= r);
+}
+
+http://en.wikipedia.org/wiki/Shaker_sort
+http://www.nist.gov/dads/HTML/shakerSort.html
+
+Odd Even Transposition Sort:
+
+
+Also called "Brick sort". Another algorithm is to alternately swap the even items with their next item for one pass, and then the odd items with their next item for the next pass. This allows both large and small items to go towards their destination as we progress too. It is similar to Shaker Sort and Improved Bubble Sort, but doesn¡¯t have a way of stopping early. The good news is that the algorithm lends itself well to parallelisation because all of the compare-and-swap operations in each pass could theoretically be performed at once. Multi-core CPUs could be utilised to do this, but perhaps to very little advantage since there are many asymptotically faster algorithms anyway.
+Odd Even Transposition Sort is stable.
+
+[show source code]
+[hide source code]
+template <class T>
+void OddEvenSort(T a[], int n) {
+    for (int i = 0; i < n; ++i) {
+        if (i & 1) {
+            for (int j = 2; j < n; j+=2)
+                if (a[j] < a[j-1])
+                    Swap(a[j-1], a[j]);
+        } else {
+            for (int j = 1; j < n; j+=2)
+                if (a[j] < a[j-1])
+                    Swap(a[j-1], a[j]);
+        }
+    }
+}
+
+http://www.cs.rit.edu/~atk/Java/Sorting/sorting.html
+
+Several-Unique Sort:
+An interesting variation of Bubble Sort was obtained by a genetic algorithm known as '"Critticall". That's right; a computer learned a better algorithm. The change was to make all items equal to the current bubble, float up with it. This was called Several-Unique Sort, because it works well when there are several instances of each item (i.e. duplicates), but it is otherwise slightly slower than bubble sort.
+Several Unique Sort is NOT stable.
+
+[show source code]
+[hide source code]
+template <class T>
+void SeveralUniqueSort(T a[], int n) {
+    T HighValue;        // Highest value found in current scan.
+    T NewValue;         // Value of current element.
+    // Scan all elements on the first pass.
+    int EndIndex = n - 1;  // Index where current scan should end.
+    int SwapIndex; // First index of highest value found.
+    int Position;  // Current scan position.
+    // For each distinct element value...
+    if (n > 0) {
+        do {
+            SwapIndex = 0;
+            Position = -1;
+            // Start by assuming the first as highest value
+            HighValue = a[0];
+            // For each element, scanning from start to end...
+            while (Position < EndIndex) {
+                // Get the next element.
+                NewValue = a[++Position];
+                // If the current value is lower, swap it with highest so far.
+                // Rather than swapping the lower value again, use the next
+                // position which is the first occurrence of the highest value.
+                if (NewValue < HighValue) {
+                    a[SwapIndex++] = NewValue;
+                    a[Position] = HighValue;
+                }
+                // If the current value is higher, remember its value/position.
+                if (HighValue < NewValue) {
+                    SwapIndex = Position;
+                    HighValue = a[Position];
+                }
+            }
+            // Finish the next scan prior to the highest value found in this pass,
+            // as its elements are now in their final positions.
+            EndIndex = SwapIndex - 1;
+        } while (Position >= SwapIndex);
+    }
+}
+
+http://www.critticall.com/sort.html
+
+Comb Sort:
+The most effective way to improve bubble sort is to allow the gap between items compared to vary. Start off high and then decrease, in the same way that if your hair was really knotted you wouldn't reach for you finest toothed comb first. You'd probably use a comb with big teeth first to get out the big knots, and then use a finer comb. This is exactly what comb sort does.
+Many people have tried different shrink factors other than 1.3 with this algorithm, and there are even lists of hand-optimised gap tables out there. But I still find that it¡¯s very hard to beat the factor of 1.3 and the special modification to prevent gaps of nine or ten (known as combSort11), by any significant amount, and some other gap-tables are actually slower. The same early-exit trick of improved bubble sort is also utilised here.
+Comb sort is NOT stable.
+
+[show source code]
+[hide source code]
+template <class T>
+while CombSort(T a[], int n) {
+    bool swapped;
+    int gap = n;
+    do {
+        gap = (gap*10)/13;
+        switch (gap) {
+            case 0 : gap = 1;  break;
+            case 9 :
+            case 10: gap = 11; break; // this is what makes this Combsort11
+            default:           break;
+        }
+        swapped = false;
+        for (int i = gap; i < n; ++i) {
+            const int j = i - gap;
+            if (a[i] < a[j]) {
+                Swap(a[i], a[j]);
+                swapped = true;
+            }
+        }
+    } while (swapped || (gap > 1));
+}
+http://en.wikipedia.org/wiki/Comb_sort
+http://www.nist.gov/dads/HTML/combSort.html
+
+HBubbleSort
+The same technique as is used in Shell Sort (see further down the page) can be used with Bubble Sort. Each pass consists of a bubble sort pass, instead of an insertion pass as would be done in Shell Sort. This algorithm is rarely used as it exists mostly to demonstrate that the principle used in Shell Sort can be used independently of the H-Sorting algorithm used.
+Like Shell Sort, H-Bubble Sort is NOT stable.
+[show source code]
+[hide source code]
+template <class T>
+void HBubbleSort(T a[], int n) {
+    for (int m = n; m > 0; m = static_cast<int>(floor(m * (1.0/1.33)))) {
+        for (int i = 0; i < m; ++i) {
+            int l = i+((n-i-1)/m)*m;
+            do {
+                int k = 0;
+                for (int j = i; j < l; j+=m) {
+                    if (a[j + m] < a[j]) {
+                        Swap(a[j], a[j + m]);
+                        k = j;
+                    }
+                }
+                l = k;
+            } while (m == 1 && l > i);
+        }
+    }
+}
+http://www.cs.princeton.edu/~rs/shell/paperF.pdf
+HShakeSort
+The same technique as is used in Shell Sort (see further down the page) can be used with Shaker Sort. Each pass consists of a upwards and a downwards shaker sort pass, instead of an insertion pass as would be done in Shell Sort. This algorithm is also rarely used as it exists mostly to demonstrate that the principle used in Shell Sort can be used independently of the H-Sorting algorithm used.
+Like Shell Sort, H-Shake Sort is NOT stable.
+[show source code]
+[hide source code]
+template <class T>
+void HShakeSort(T a[], int n) {
+    for (int m = n; m > 0; m = static_cast<int>(floor(m * (1.0/1.7)))) {
+        for (int i = 0; i < m; ++i) {
+            int j, l = i+m, r = i+((n-i-1)/m)*m, k = r;
+            do {
+                //move smallest towards bottom
+                for (j = r; j >= l; j-=m)
+                    if (a[j] < a[j - m]) {
+                        Swap(a[j - m], a[j]);
+                        k = j;
+                    }
+                l = k + m;
+                //move largest towards top
+                for (j = l; j <= r; j+=m)
+                    if (a[j] < a[j - m]) {
+                        Swap(a[j - m], a[j]);
+                        k = j;
+                    }
+                r = k - m;
+            } while (m == 1 && l <= r);
+        }
+    }
+}
+http://www.cs.princeton.edu/~rs/shell/paperF.pdf
+
+HBrickSort
+The same technique as is used in Shell Sort (see further down the page) can be used with Brick Sort. Each pass consists of an odd and an even brick sort pass, instead of an insertion pass as would be done in Shell Sort. This algorithm is also rarely used as it exists mostly to demonstrate that the principle used in Shell Sort can be used independently of the H-Sorting algorithm used.
+Like Shell Sort, H-Brick Sort is NOT stable.
+
+[show source code]
+[hide source code]
+template <class T>
+void HBrickSort(T a[], int n) {
+    for (int m = n; m > 0; m = static_cast<int>(floor(m * (1.0/1.22)))) {
+        for (int i = 0; i < m; ++i) {
+            bool swapped;
+            const int m2 = m+m;
+            do {
+                swapped = false;
+                for (int j = i+m; j < n; j+=m2) {
+                    if (a[j] < a[j-m]) {
+                        Swap(a[j-m], a[j]);
+                        swapped = true;
+                    }
+                }
+                for (int j = i+m2; j < n; j+=m2) {
+                    if (a[j] < a[j-m]) {
+                        Swap(a[j-m], a[j]);
+                        swapped = true;
+                    }
+                }
+            } while (m == 1 && swapped);
+        }
+    }
+}
+http://www.cs.princeton.edu/~rs/shell/paperF.pdf 
+
+Selection Sort Techniques
+Selection Sort:
+
+
+Another basic sorting strategy is to simply search for the next largest (or smallest if you prefer) item on each pass and move it into position. This gives the advantage that we only need to perform one swap on each pass, making it much better in terms of less copying, but performing the same number of comparisons. At first one might think this would make a huge speed difference, but in reality it doesn't make that much difference. This algorithm is called Selection Sort.
+Selection Sort on an array is NOT stable because in order to place an item in its final spot, we move the item that was there to somewhere that might be before some other item that was equal to it, thus reversing the order of items that were equal (if you follow).
+
+[show source code]
+[hide source code]
+template <class T>
+void SelectionSort(T a[], int n) {
+    for (int i = n-1; i > 0; --i) {
+        int nmax = 0;
+        //find biggest
+        for (int j = i; j > 0; --j)
+            if (a[nmax] < a[j])
+                nmax = j;
+        //put biggest in place
+        Swap(a[i], a[nmax]);
+    }
+}
+
+http://en.wikipedia.org/wiki/Selection_sort
+http://www.nist.gov/dads/HTML/selectionsrt.html
+
+Dual Selection Sort:
+In an effort to further reduce copying, and reduce the number of passes, you can of course search for the next smallest and next largest item on each pass, and move both into position. There is a special case you have to deal with though, when the largest item is already where you want the smallest one to go. Even with the attempted improvements, it most likely not going to be significantly faster than standard selection sort. Dual Selection sort on an array is also NOT stable.
+
+[show source code]
+[hide source code]
+template <class T>
+void DualSelectionSort(T a[], int n) {
+    int i = 0, nmin, nmax;
+    while (i < --n) {
+        //find largest and smallest
+        nmin = nmax = i;
+        for (int j = n; j > i; --j) {
+            if (a[j] < a[nmin])
+                nmin = j;
+            else if (a[nmax] < a[j])
+                nmax = j;
+        }
+        //put them at the correct ends
+        Swap(a[nmin], a[i]);
+        if (nmax == i)
+            Swap(a[nmin], a[n]);
+        else
+            Swap(a[nmax], a[n]);
+        ++i;
+    }
+}
+http://warp.povusers.org/DoubleBurstSelectionSort/
+http://www.softpanorama.org/Algorithms/Sorting/selection_sort.shtml
+
+Bingo Sort:
+As with Several Unique Sort, we can write a selection style algorithm, which will take advantage of there being many duplicates. After finding the largest item, you perform another pass to move any other items equal to the max item to their final place. This means less passes than Selection Sort if there are on average more than 2 of each item, otherwise the extra loops only slows things down.
+Bingo Sort on an array is NOT stable for the same reason as Selection Sort.
+
+[show source code]
+[hide source code]
+template <class T>
+void BingoSort(T a[], int n) {
+    int i = n-1;
+    while (i > 0) {
+        int nmax = 0, j;
+        //find biggest
+        for (j = i; j > 0; --j)
+            if (a[nmax] < a[j])
+                nmax = j;
+        Swap(a[i], a[nmax]);
+        //if any others are the same then put them there too
+        nmax = i--;
+        j = i;
+        while (j > 0) {
+            --j;
+            if (a[nmax] == a[j]) {
+                Swap(a[i], a[j]);
+                --i;
+            }
+        }
+    }
+}
+http://www.nist.gov/dads/HTML/bingosort.html
+
+Exact Sort:
+Exact Sort is a form of Selection Sort with a difference. Usually after finding the nth smallest item you swap it with the nth item in the array. However the item that was previously at the nth position gets moved to some other location, which probably isn't its final resting position. Consequently each item ends up getting moved almost twice on average. This algorithm goes to the extreme to further reduce unnecessary item copying. In this algorithm, before an item is placed in its final resting position, the one that was in its spot is first relocated to its final resting position, and before that, the one there must be moved to its final resting position, and before that¡¦ well you get the picture. Suffice to say, each item is only moved once. This is except of course, for the item that is removed first and put back at the end, so that you have room to move the rest around. One would only want to use this algorithm if moving an item was extremely expensive (slow) for some reason. E.g. you might do this when rearranging furniture. First work out the way or ordering things using the least moves, and then follow that plan.
+Exact sort is NOT stable.
+
+[show source code]
+[hide source code]
+template <class T>
+while ExactSort(T a[], int n) {
+    // this boolean array indicates which element is sorted which is not. False means not sorted yet.
+    // In the beginning all are false.
+    int *const b = new int[n];
+    for (int i = 0; i<n; ++i) b[i] = false;
+
+    // starting point where to start to sort?
+    // we can give it manually as well.
+    int sp = realIndex(b, 0, n); //firstFalse(b, n); // the current element.
+    int t = sp;
+    T tv =a[t]; // the value of the current element.
+    // our loop we know the max loop number is element count of array.
+    // we can use for(int i=0; i<n; i++) as well.
+    for (;;) {
+        // get the current element destination (sorted position).
+        int c = 0; // counter. It counts the unsorted and smaller elements than the given element.
+        for (int i = n; --i >= 0;)
+            if (!b[i] && i != sp && a[i] < tv) ++c;
+        int d = realIndex(b, c, n); // the destination.
+        if (d == -1) break; // there is no unsorted element any more - we're done!
+        b[d] = true;
+        //destination is equal to starting point. We have to find new starting point after locating the current element.
+        if (d == sp) {
+            // if there is no coincidence in other words if it is not in the destination in the first place
+            if (d != t) a[d] = tv; //locate the element.
+            // take the first unsorted element as a starting point.
+            sp = realIndex(b, 0, n); //firstFalse(b, n);
+            if (sp == -1) break; // there is no unsorted elements any more - we're done!
+            // setting the current element.
+            tv = a[sp];
+            t = sp;
+        } else {
+            Swap(a[d], tv);
+            t = d;
+        }
+    }
+    delete[] b;
+}
+
+int realIndex(const int b[], int f, int n) {
+    int fc = -1;
+    for (int i = 0; i<n; ++i) {
+        if (!b[i]) ++fc;
+        if (fc == f) return i;
+    }
+    return -1;
+}
+http://www.geocities.com/p356spt/
+
+Insertion Sort Techniques
+Insertion Sort:
+
+
+Another well known sorting technique is Insertion Sort. During Insertion Sort, you always have a sorted portion and an unsorted portion. Initially the sorted portion consists of only 1 item. Each subsequent step involves finding a place in the sorted portion for a single item from the unsorted portion, and inserting that item into the sorted portion. Thus enlarging the sorted portion and shrinking the unsorted portion, until the unsorted portion becomes empty. At that point, the entire thing is sorted. An unfortunate downside to this technique is that Inserting the item usually means moving many items over to make room for it. Usually the search starts from the position just to the right of where the unsorted item lies, such that if the array is already sorted, it is very fast to insert. I prefer to first test if the item to be inserted actually needs any moving at all, and if not (i.e. it comes after all items in the sorted portion), we simply extend the sorted portion to include this item, and don't move anything. In fact, this is among the fastest algorithms for sorting an almost sorted array. When it is completely sorted, there are O(n) compares and no swaps. That's the same amount of work as testing if an array is sorted already! However if the array starts off in reverse order, it will be very slow because many moves and many comparisons will be required. Note: Moving items over to make room for insertion, can be done by means of repeated swapping; however I prefer to simply remember the value to insert, move the required items all over by one, and then place the remembered item into the hole.
+Insertion sort is stable.
+
+[show source code]
+[hide source code]
+template <class T>
+void InsertionSort(T a[], int n) {
+    for (int i = 1; i < n; ++i) {
+        //check if the item needs inserting first (eliminates redundant copying)
+        if (a[i] < a[i - 1]) {
+            int j = i - 1;
+            const T tempItem = a[i];
+            //move items along while looking for the correct place
+            do {
+                a[j + 1] = a[j];
+                --j;
+            } while ((j >= 0) && (tempItem < a[j]));
+            //copy item into position
+            a[j + 1] = tempItem;
+        }
+    }
+}
+http://en.wikipedia.org/wiki/Insertion_sort
+http://www.nist.gov/dads/HTML/insertionSort.html
+
+Dual Insertion Sort:
+Insertion sort, like bubble sort can be improved in various ways. The main problem with it is that it takes so long to move items over in memory to make space for the item to be inserted. One (not so effective) way to reduce this is to store two sorted portions, on at the end of the array, and one at the beginning. This means that one you've worked out which end to insert into; there are half as many moves required for inserting it. As things progress, having to move on average half the number of items to perform an insert begins to halve the time taken to sort. However the size of the sorted portions needs to occasionally be balanced as well, by performing an extra swap occasionally to transfer items from the end of the larger sorted portion onto the smaller portion. For a large number of items this modified algorithm might cut the time taken by perhaps almost 50%, which is not that fantastic since a large array can be sorted much faster using other techniques anyway. You could say that this 'optimisation' is beating a dead horse, but in a way it is a step towards the Library Sort algorithm mentioned further on.
+
+As far as I am aware, this algorithm is my own creation. Therefore I do not yet have any links to other sites with the algorithm. Furthermore its usefulness is extremely low anyway, as it is rather large and not significantly faster than insertion sort.
+
+[show source code]
+[hide source code]
+template <class T>
+void DualInsertionSort(T a[], int n) {
+    int p = 0, q = n-1;
+    while (p < q) {
+        if (p < n-1-q) {
+            //balance high and low sorted portions
+            if ((q < n-1) && (a[q] < a[p])) {
+                Swap(a[p + 1], a[q]);
+                ++q;
+            }
+            //insert into low end
+            if (a[p + 1] < a[p]) {
+                int j = p;
+                const T tempItem = a[p + 1];
+                do {
+                    a[j + 1] = a[j];
+                    --j;
+                } while ((j >= 0) && (tempItem < a[j]));
+                a[j + 1] = tempItem;
+            }
+            ++p;
+        } else {
+            //balance high and low sorted portions
+            if ((p > 0) && (a[q] < a[p])) {
+                Swap(a[p], a[q - 1]);
+                --p;
+            }
+            //insert into high end
+            if (a[q] < a[q - 1]) {
+                int j = q;
+                const T tempItem = a[q - 1];
+                do {
+                    a[j - 1] = a[j];
+                    ++j;
+                } while ((j < n) && (a[j] < tempItem));
+                a[j - 1] = tempItem;
+            }
+            --q;
+        }
+    }
+}
+Binary Insertion Sort:
+Another way to speed insertion sort up a little, is to perform a binary search to find the place to insert. Although most of the time is spent move items along to make space, the searching phase for each item can be significantly improved (especially over the reverse sorted case) by performing a binary search. The trade-off is that the already sorted case will be slower, because it will take n*log(n) compares instead of just n, but the average case will improve somewhat.
+Binary Insertion sort can be stable if written carefully, as shown.
+
+[show source code]
+[hide source code]
+template <class T>
+void BinaryInsertionSort(T a[], int n) {
+    for (int i = 1; i < n; ++i) {
+        int l = 0, r = i, j = i-1;
+        const T tempItem = a[i];
+        while (l < r) {
+            const int m = (l + r)>>1; //midpoint
+            if (tempItem < a[m])
+                r = m;
+            else
+                l = m + 1;
+        }
+        //move items over to make room
+        while (j >= l) {
+            a[j + 1] = a[j];
+            --j;
+        }
+        //copy item into position
+        a[l] = tempItem;
+    }
+}
+http://en.wikipedia.org/wiki/Insertion_sort
+http://www.nist.gov/dads/HTML/binaryinsort.html
+
+Interpolation Insertion Sort
+Another way to search for the insertion point is by successive approximations using interpolation search. Basically you calculate about where the insert should go, and then see if your estimate was too high or too low and make another linearly interpolated guess. This is very much like binary searching, but can often be faster. However this also requires that the items at the very least, also support being subtracted. That means Either being a built-in type, or having a subtraction operator defined in addition to the less-than operator. This is therefore not a comparison-based sorting algorithm.
+Interpolation Insertion sort can also be stable if written carefully, as shown.
+
+[show source code]
+[hide source code]
+template <class T>
+void InterpInsertionSort(T a[], int n) {
+    for (int i = 1; i < n; ++i) {
+        int l = 0, r = i-1, j = r, m;
+        const T tempItem = a[i];
+        while (l <= r) {
+            const int range = int(a[r] - a[l]);
+            if (range > 0) {
+                m = int(l + ((tempItem-a[l])*(r-l))/range); //interpolation point
+                //make sure m is in range [l .. r]
+                if (m < l)
+                    m = l;
+                else if (m > r)
+                    m = r;
+            } else
+                m = l;
+            if (tempItem < a[m])
+                r = m - 1;
+            else
+                l = m + 1;
+        }
+        //move items over to make room
+        while (j >= l) {
+            a[j + 1] = a[j];
+            --j;
+        }
+        //copy item into position
+        a[l] = tempItem;
+    }
+}
+Strand Sort:
+Another way to improve upon the insertion technique is to identify runs of items in the array, and insert all of the items in the run in the same pass. This is the idea behind Strand sort. First measure the length of the ascending sequence, and then make a pass through the sorted portion to insert those items. The insertion pass for the run is actually the same as an in-place merge, which we'll come across later.
+Strand sort is stable.
+
+[show source code]
+[hide source code]
+template <class T>
+void StrandSort(T a[], int n) {
+    int m, r;
+    if (n > 1) {
+        r = 0;
+        do {
+            //find longest run
+            m = r;
+            do ++r; while ((r < n) && !(a[r] < a[r-1]));
+            //merge sorted run with previous sorted run
+            InPlaceMerge(a, 0, m, r);
+        } while (r < n);
+    }
+}
+http://www.nist.gov/dads/HTML/strandSort.html
+
+Bidirectional Strand Sort:
+We can attempt to further enhance strand sort by allowing it to recognise reverse sorted strands too, flip those around then insert/merge them as per strand sort. This usually boosts the average sequence length. You could again say that this 'optimisation' is beating a dead horse though.
+Bidirectional Strand Sort is stable if you only look for explicitly decreasing sequences before reversing them, as done here.
+
+As far as I am aware, this algorithm is my own creation. Therefore I do not yet have any links to other sites with the algorithm. Furthermore its usefulness is extremely low anyway.
+
+[show source code]
+[hide source code]
+template <class T>
+void BidirectionalStrandSort(T a[], int n) {
+    int m, r;
+    if (n > 1) {
+        r = 0;
+        do {
+            //find longest run
+            m = r++;
+            if (r < n) {
+                if (a[r] < a[r-1]) {
+                    do ++r; while ((r < n) && (a[r] < a[r-1]));
+                    Reverse(&a[m], r-m);
+                } else {
+                    do ++r; while ((r < n) && !(a[r] < a[r-1]));
+                }
+            }
+            //merge sorted run with previous sorted run
+            InPlaceMerge(a, 0, m, r);
+        } while (r < n);
+    }
+}
+Order Sort:
+This algorithm is kind of a cross between array-based Insertion Sort and list-based Insertion Sort, that attempts to keep the advantages of both.
+It uses an index list internally, allowing insertion into the sorted portion (of the index list) in constant time. However unlike list-based insertion sort, it can find the point of insertion in faster than O(n) time. This is done by sampling through the original array over some of the items that have already been inserted. Instead of examining half of them on average, it explicitly scans the square root of the number inserted so far at even intervals, and uses this as a best guess. From there it scans linearly forwards to find the real insertion point. Of m items already inserted, this samples sqrt(m) items initially, plus on average sqrt(m)/2 further items to find the real insertion point, assuming the initial sampling gave a close approximation. This leads to an execution time of about O(n1.5), though it is difficult to pinpoint exactly.
+Just like list-based Insertion Sort, Order Sort is stable.
+
+[show source code]
+[hide source code]
+template <class T>
+void OrderSort(T a[], int n) {
+    // Variable declarations
+    T *c = new T[n];
+    T HighestBelow, HighestEntry, LowestEntry;
+    int *b = new int[n];
+    int x, y, EntryStep;
+    int HighestBelowPos, CurrentPosition, Buffer1, Buffer2 = 0;
+    int HighestSeen = 0, LowestSeen = 0;
+
+    for (x=0; x < n; ++x) {
+        const T EntryValue = a[x];
+        bool IsLower = false;
+        bool IsHigher = false;
+
+        // Is it the lowest value so far?
+        if (x==0 || a[x] < LowestEntry) {
+            IsLower = true;
+            b[x] = LowestSeen;
+            LowestEntry = EntryValue;
+            LowestSeen = x;
+        }
+        // Is it the highest value so far?
+        if (x==0 || !(a[x] < HighestEntry)) {
+            IsHigher = true;
+            b[HighestSeen] = x;
+            b[x] = 0;
+            HighestEntry = EntryValue;
+            HighestSeen = x;
+        }
+        // If not lowest or highest, find the next-lowest value
+        if (!IsLower && !IsHigher) {
+            // Jump through list to find any lower value
+            EntryStep = 1 + (int)floor(sqrt((double)x));
+            HighestBelowPos = n;
+            for (y=0; y < x; y += EntryStep) {
+                if (HighestBelow < a[y] && a[y] < EntryValue) {
+                    HighestBelow = a[y];
+                    HighestBelowPos = y;
+                }
+            }
+            // If lower value not found, use lowest value
+            if (HighestBelowPos == n) {
+                HighestBelow = LowestEntry;
+                HighestBelowPos = LowestSeen;
+            }
+            // Loop through list to find highest lower value
+            bool IsNotGreater = true;
+            CurrentPosition = HighestBelowPos;
+            do {
+                Buffer1 = CurrentPosition;
+                CurrentPosition = b[CurrentPosition];
+                if (EntryValue < a[CurrentPosition]) {
+                    IsNotGreater = false;
+                    Buffer2 = CurrentPosition;
+                }
+            } while (IsNotGreater);
+            // Change list
+            b[Buffer1] = x;
+            b[x] = Buffer2;
+        }
+    }
+
+    // Carry out sorting
+    CurrentPosition = LowestSeen;
+    for (x=0; x < n; ++x) {
+        c[x] = a[CurrentPosition];
+        CurrentPosition = b[CurrentPosition];
+    }
+    for (x=0; x < n; ++x)
+        a[x] = c[x];
+
+    delete[] b;
+    delete[] c;
+}
+http://www.ddj.com/dept/cpp/184402000 
+
+Shell Merge Sort:
+Perhaps the best way to improve insertion sort is the same way we made comb sort such a huge improvement over bubble sort. We allow the sorted arrays to consist of items that are very spread out. I've called this Shell Merge Sort, because it has similarities to both Shell Sort and Merge Sort. In fact it performs basically the same as the original Shell Sort which halved the increment size after each pass, except that the order of the passes is different.
+This sorting algorithm is NOT stable.
+
+I have not seen Shell Sort written like this elsewhere. Therefore I do not yet have any links to other sites with the algorithm. Furthermore it has no advantage over normal Shell Sort, which does not use recursion.
+
+[show source code]
+[hide source code]
+template <class T>
+void ShellMerge(T a[], int n, int d) {
+    for (int i = d; i < n; i+=d) {
+        //check if the item needs inserting first (eliminates redundant copying)
+        if (a[i] < a[i - d]) {
+            int j = i - d;
+            const T tempItem = a[i];
+            do {
+                a[j + d] = a[j];
+                j -= d;
+            } while ((j >= 0) && (tempItem < a[j]));
+            a[j + d] = tempItem;
+        }
+    }
+}
+
+template <class T>
+void ShellMergeSortAux(T a[], const int n, const int d) {
+    if (d < n) {
+        ShellMergeSortAux(a, n, d*2);
+        ShellMergeSortAux(&a[d], n-d, d*2);
+        ShellMerge(a, n, d);
+    }
+}
+
+template <class T>
+void ShellMergeSort(T a[], int n) {
+    ShellMergeSortAux(a, n, 1);
+}
+
+
+Shell Sort:
+
+The other way to improve insertion sort is of course, Shell Sort invented by Donald Shell in 1959. 
+Whereby the same principle as Comb Sort is used, except that the insertion method is used to k-sort the items on each pass. 
+There are many variants of this algorithm alone, but basically they all just use different number sequences 
+for the gap sizes in each pass. 
+The Incerpj - Sedgewick sequence used here is currently regarded as the best and is about O(nlog2n), 
+but there are a lot of other gap table variations out there. 
+Of algorithms that use no extra heap or stack memory (recursive calls) this is among the fastest.
+This sorting algorithm is NOT stable.
+
+[show source code]
+[hide source code]
+template <class T>
+void ShellSort(T a[], int n) {
+    //Incerpj-Sedgewick 1985
+    const int incs[] = {
+        1, 3, 7, 21, 48, 112,
+        336, 861, 1968, 4592, 13776,
+        33936, 86961, 198768, 463792, 1391376,
+        3402672, 8382192, 21479367, 49095696, 114556624,
+        343669872, 52913488, 2085837936};
+    for (int l = sizeof(incs)/sizeof(incs[0]); l > 0;) {
+        const int m = incs[--l];
+        for (int i = m; i < n; ++i) {
+            int j = i - m;
+            if (a[i] < a[j]) { //check if the item needs inserting first (eliminates redundant copying)
+                const T tempItem = a[i];
+                do {
+                    a[j+m] = a[j];
+                    j-=m;
+                } while ((j >= 0) && (tempItem < a[j]));
+                a[j+m] = tempItem;
+            }
+        }
+    }
+}
+http://www.nist.gov/dads/HTML/shellsort.html
+http://www.research.att.com/~njas/sequences/A036569
+http://www.cs.fiu.edu/~weiss/Shellsort.html
+
+Hybrid Comb Sort:
+Comb Sort (mentioned at the end of the bubble-sort section) can be further sped up by switching to Insertion Sort when the comparison gap becomes small enough. This is called Hybrid Comb sort.
+This sorting algorithm is NOT stable.
+
+[show source code]
+[hide source code]
+template <class T>
+
+void HybridCombSort(T a[], int n) {
+    int gap = n;
+    while (gap > 8) {
+        gap = (gap*10)/13;
+        for (int i = gap; i < n; ++i) {
+            const int j = i - gap;
+            if (a[i] < a[j])
+                Swap(a[i], a[j]);
+        }
+    }
+    InsertionSort(a, n);
+}
+
+http://yagni.com/combsort/correspondence.php
+
+
+
+Library Sort:
+There have been some very recent developments which expand on the insertion method of sorting, such as Library Sort. 
+The idea expands on Insertion Sort, and attempts to get around the problem of requiring so many moves to insert each item. 
+It leaves holes in the target array so that it doesn't don't have to move many items when doing the insert. 
+When the number of holes gets low, a special pass is done to spread the items out some more again. 
+This implementation was created from a description of the algorithm, as I have never actually seen another implementation of it.
+As such, it might not be 100% as the authors (Michael A Bender, Martin Farach-Colton, Miguel Mosteiro 2004) intended it, 
+but nevertheless it works well enough, even though this implementation is rather large.
+The below implementation of this algorithm is NOT stable, though it should be able to be modified to be stable
+
+[show source code]
+[hide source code]
+template <class T>
+while LibrarySort(T a[], int n) {
+    if (n > 1) {
+        const double E = 1.25; // Must be >= 1
+        const int maxNumElems = int(floor(n*E));
+        const int MyNULL = int(-1);
+        int nnn = 0;
+        int* items = new int[maxNumElems];
+        for (int i = 0; i < maxNumElems; ++i)
+            items[i] = MyNULL;
+
+        for (int phase = 1; phase <= n; phase<<=1) {
+            int numElems = int(floor((phase*2-1)*E));
+            if (numElems > maxNumElems)
+                numElems = maxNumElems;
+            for (int k = 0; k < phase; ++k) {
+                // Now insert item a[nnn]
+                int l = 0, r = numElems, j;
+                const int tempItem = nnn;
+                while (l < r) {
+                    int m = FindNonNullMidpointItem(items, l, r);
+                    if (m == MyNULL) break;
+                    if (a[items[m]] < a[tempItem])
+                        l = m + 1;
+                    else
+                        r = m;
+                }
+
+                // Move items over to make room
+                j = l;
+                while (items[j] != MyNULL && j < numElems)
+                    ++j;
+                if (j == numElems) {
+                    // oh dear, we hit the end...
+                    j = l--;
+                    do {
+                        --j;
+                    } while (items[j] != MyNULL && j > 0);
+                    // move items left to make room
+                    while (j < l) {
+                        items[j] = items[j+1];
+                        ++j;
+                    }
+                } else {
+                    // move items right to make room
+                    while (j > l) {
+                        items[j] = items[j-1];
+                        --j;
+                    }
+                }
+                // Now put the item in its spot
+                items[l] = tempItem;
+                if (++nnn == n)
+                    break;
+            }
+
+            // Spread elements
+            double numElems2 = (phase*4-3)*E;
+            if (numElems2 <= maxNumElems) {
+                for (; numElems2 >= 0; numElems2-=E*2) {
+                    while (numElems >= 0 && items[numElems] == MyNULL)
+                        --numElems;
+                    if (numElems < 0)
+                        break;
+                    const int thePos = int(floor(numElems2));
+                    if (items[thePos] == MyNULL) {
+                        items[thePos] = items[numElems];
+                        items[numElems] = MyNULL;
+                    }
+                    --numElems;
+                }
+            }
+        }
+
+        // Compact the index list
+        int iFrom=0, iTo=0;
+        while (iFrom < maxNumElems) {
+            if (items[iFrom] != MyNULL)
+                items[iTo++] = items[iFrom];
+            ++iFrom;
+        }
+
+        // Reorder items to match index list, requiring only 1 temporary item
+        ReorderAccordingTo(a, n, items);
+        // Cleanup
+        delete[] items;
+    }
+}
+
+int FindNonNullMidpointItem(const int items[], int l, int r) {
+    const int MyNULL = ~0;
+    const int m = (l + r)>>1; //midpoint
+    int mPlusOff = m, mOff = 0;
+    do {
+        if (items[mPlusOff] != MyNULL)
+            return mPlusOff;
+        mOff = (mOff >= 0) ? -mOff-1 : -mOff;
+        mPlusOff = m + mOff;
+    } while (mPlusOff >= l && mPlusOff < r);
+    return MyNULL;
+}
+
+while ReorderAccordingTo(T a[], int n, int indexes[]) {
+    // Reorder items to match index list, requiring only 1 temporary item
+    for (int i=0; i<n; ++i) {
+        if (indexes[i] != i) { //check if item is in place
+            const T tempItem = a[i];
+            int l = i, j;
+            while ((j = indexes[l]) != i) {
+                a[l] = a[j];
+                indexes[l] = l;
+                l = j;
+            }
+            a[l] = tempItem;
+            indexes[l] = l;
+        }
+    }
+}
+http://en.wikipedia.org/wiki/Library_sort
+http://www.cs.sunysb.edu/~bender/pub/FUN2004-librarysort.ps
+
+Merge Sort Techniques
+In-Place Merge Sort:
+Another way to sort is by using a technique known as merging. Using the process of induction, we can write a divide-and-conquer algorithm that splits the problem up into two smaller sequences, sorts those using the same algorithm and then merges those two to produce a larger sorted list, merely by removing the first item from the sequence with the lowest item each time and appending it onto the sorted sequence.
+In-Place Merge Sort is stable.
+
+[show source code]
+[hide source code]
+template <class T>
+void Rotate(T a[], int n, const int amount) {
+    int num = n, dest = 0, source = n-amount;
+    int start = dest;
+    T tempItem = a[dest];
+    for (;;) {
+        --num;
+        a[dest] = a[source];
+        dest = source;
+        source -= amount;
+        if (source < 0) source += n;
+        if (source == start) {
+            a[dest] = tempItem;
+            if (--num <= 0) break;
+            if (--dest < 0) dest += n;
+            if (--source < 0) source += n;
+            start = dest;
+            tempItem = a[dest];
+        }
+    }
+}
+
+template <class T>
+void InPlaceMerge(T a[], const int l, const int m, const int r) {
+    int i = l-1, j = m;
+    while (j < r) {
+        //skip as many items that don't need moving as possible
+        do ++i; while ((i < j) && !(a[j] < a[i]));
+        if (i >= j) break;
+        const int oldj = j;
+        //find out the size of the chunk that needs moving
+        do ++j; while ((j < r) && (a[j] < a[i]));
+        const int num = j-oldj;
+        //move the chunk
+        Rotate(&a[i], j-i, num);
+        i += num;
+    }
+}
+
+template <class T>
+void InPlaceMergeSortAux(T a[], const int l, const int r) {
+    if (r - l > 1)
+    {
+        const int m = (l + r)>>1; //midpoint
+        InPlaceMergeSortAux(a, l, m);
+        InPlaceMergeSortAux(a, m, r);
+        InPlaceMerge(a, l, m, r);
+    }
+}
+
+template <class T>
+void InPlaceMergeSort(T a[], int n) {
+    InPlaceMergeSortAux(a, 0, n);
+}
+http://www.cs.ubc.ca/spider/harrison/Java/sorting-demo.html
+
+Bitonic Merge Sort:
+Unfortunately it doesn't turn out to be very easy to efficiently merge data 'in-place' in an array. We have a few options though. We could sort the second half in reverse, which at first seems counter-productive, but this novel idea allows us to actually sort it much faster without using extra memory. Note that despite what you may find another website saying, this idea only works for array sizes that are a power of two. The modification made by some to pretend that it is a power of two in size, but with the imaginary elements before the start all being equal, does not work. I have emailed the author of one site about this, showing that even in their own applet some cases will fail, but I have got no response. My own solution is to perform an Insertion Sort pass over the array afterwards if the size was not a power of two, as it will be mostly in order.
+
+[show source code]
+[hide source code]
+template <class T>
+void BitonicMerge(T a[], int lo, int cnt, bool ascend) {
+    while (cnt > 1) {
+        cnt >>= 1;
+        for (int i=((lo>0) ? lo : 0); i<lo+cnt; ++i)
+            if (ascend == (a[i+cnt] < a[i]))
+                Swap(a[i], a[i+cnt]);
+        BitonicMerge(a, lo, cnt, ascend);
+        lo += cnt;
+    }
+}
+
+template <class T>
+void BitonicSortAux(T a[], int lo, int cnt, bool ascend) {
+    if (cnt > 1) {
+        const int k = cnt >> 1;
+        BitonicSortAux(a, lo, k, true);
+        BitonicSortAux(a, lo+k, k, false);
+        BitonicMerge(a, lo, cnt, ascend);
+    }
+}
+
+template <class T>
+void BitonicSort(T a[], int n) {
+    int PowerOfTwo = 1;
+    while (PowerOfTwo < n) PowerOfTwo<<=1;
+    BitonicSortAux(a, n-PowerOfTwo, PowerOfTwo, true);
+    //This algorithm really only works for powers of two, so if it's not then...
+    if ((n&(n-1)) != 0) InsertionSort(a, n);
+}
+http://www.nist.gov/dads/HTML/bitonicSort.html
+http://www.tools-of-computing.com/tc/CS/Sorts/bitonic_sort.htm
+
+Merge Sort:
+Although Merge Sort can be implemented without using extra memory, the merging process is either slow or complicated that way. A much faster or easier way to merge is to use extra memory for the merges. Merge Sort using a second buffer as a temporary only. Or better yet, merge from one buffer into another, then merge back again, as I've done below. Merge Sort is stable.
+
+[show source code]
+[hide source code]
+template <class T>
+while MergeSort(T a[], int n) {
+    T *const b = new T[n];
+    MergeSortAtoA(a, b, 0, n);
+    delete[] b;
+}
+
+template <class T>
+while MergeSortAtoA(T a[], T b[], const int l, const int r) {
+    if (r - l > 1) {
+        const int m = (l + r)>>1; //midpoint
+        MergeSortAtoB(a, b, l, m);
+        MergeSortAtoB(a, b, m, r);
+        MergeAtoB(b, a, l, m, r); //Note a & b reversed (this is B->A)
+    }
+}
+
+template <class T>
+while MergeSortAtoB(T a[], T b[], const int l, const int r) {
+    if (r - l > 1) {
+        const int m = (l + r)>>1; //midpoint
+        MergeSortAtoA(a, b, l, m);
+        MergeSortAtoA(a, b, m, r);
+        MergeAtoB(a, b, l, m, r);
+    } else if (r - l == 1) {
+        b[l] = a[l];
+    }
+}
+
+template <class T>
+while MergeAtoB(const T a[], T b[], const int l, const int m, const int r) {
+    int i = l, j = m, c = l;
+    //merge items while both lists are not empty
+    while (i < m && j < r)
+        b[c++] = (a[j] < a[i]) ? a[j++] : a[i++];
+    //copy remaining items into place
+    while (i < m) b[c++] = a[i++];
+    while (j < r) b[c++] = a[j++];
+}
+Breadth-First Merge Sort:
+
+
+Merge Sort is fairly recursive, and obviously it would be nice to not use so much stack space. With some effort we can translate the algorithm to its iterative 'breadth-first' form. However, doing this it seems quite difficult at first to deal with arrays that are not a power of two in size. No Problem, we just pretend it is a power of two, but ignore any items outside the actual range. We then treat the array as n sequences of length 1. We merge odd and even sub-arrays to produce n/2 sequences of length 2. Then we again merge odd and even sub-arrays to produce n/4 sequences of length 4, etc. Until finally we merge 2 sequences of length n/2 to complete the sorting.
+Breadth-First Merge Sort is stable.
+
+[show source code]
+[hide source code]
+template <class T>
+while BreadthFirstMergeSort(T a[], int n) {
+    T *const b = new T[n];
+    int powerOfTwo=1;
+    while (powerOfTwo < n) powerOfTwo<<=1;
+    //all runs are a power of two in size, extending past start of array,
+    //although items before the start are not touched
+    int lo = n-powerOfTwo, step = 1;
+    while (step < powerOfTwo) {
+        int val = lo;
+        while (val < n) {
+            int l = val; val += step;
+            const int m = val; val += step;
+            if (m > 0) { //if first run is not all before the start
+                const int r = val;
+                if (l < 0) l = 0; //don't touch items before the start
+                MergeAtoA(a, b, l, m, r);
+            }
+        }
+        step<<=1;
+    }
+    //cleanup
+    delete[] b;
+}
+
+template <class T>
+while MergeAtoA(T a[], T b[], const int l, const int m, const int r) {    
+    int i = l, j = m, c = l;
+    //merge items while both lists are not empty
+    while (i < m && j < r)
+        b[c++] = (a[j] < a[i]) ? a[j++] : a[i++];
+    int d = c;
+    //copy remaining items into place
+    while (i < m) a[d++] = a[i++];
+    //copy merged items back into original array
+    for (int k = l; k < c; ++k)
+        a[k] = b[k];
+}
+Breadth-First Bitonic Merge Sort:
+
+
+We could have used the same 'breadth-first' idea just mentioned back when we were doing bitonic merges too. Build tiny increasing and decreasing sequences and use bitonic merge on those until you have a single bitonic sequence, and then make that in to the first half of a bitonic sequence, conveniently known as a monotonic (i.e. sorted) sequence.
+
+[show source code]
+[hide source code]
+template <class T>
+void BreadthBitonicSort(T a[], int n) {
+    int PowerOfTwo = 1, lo, cnt, start;
+    while (PowerOfTwo < n)
+        PowerOfTwo<<=1;
+    lo = n-PowerOfTwo;
+    for (int step = 2; step <= PowerOfTwo; step<<=1) {
+        cnt = step;
+        do {
+            cnt >>= 1;
+            start = lo;
+            do {
+                if (start >= 0)
+                    if ((((start-lo) & step) == 0) == (a[start+cnt] < a[start]))
+                        Swap(a[start], a[start+cnt]);
+                if (((++start-lo) & cnt) != 0) start += cnt;
+            } while (start+cnt < n);
+        } while (cnt > 1);
+    }
+    //This algorithm really only works for powers of two, so if it's not then...
+    if ((n&(n-1)) != 0) InsertionSort(a, n);
+}
+http://www.tools-of-computing.com/tc/CS/Sorts/bitonic_sort.htm
+
+Semi-Breadth-First Bitonic Merge Sort:
+When first attempting to write this in its breadth-first form, I only made the inner loop breadth-first, not the outer one. This gives yet another distinct sorting pattern, and actually seemed to run faster than either of the other forms, so I kept it.
+
+[show source code]
+[hide source code]
+template <class T>
+void SemiBreadthBitonicSort(T a[], int n) {
+    int PowerOfTwo = 1;
+    while (PowerOfTwo < n) PowerOfTwo<<=1;
+    int lo = n-PowerOfTwo;
+    for (int step=2; step <= PowerOfTwo; step<<=1) {
+        int val = lo;
+        bool ascend = true;
+        do {
+            int cnt = step, finish = val+step;
+            
+            do {
+                cnt >>= 1;
+                int start = val, mid = val+cnt;
+                do {
+                    if (start >= 0)
+                        if (ascend == (a[start+cnt] < a[start]))
+                            Swap(a[start], a[start+cnt]);
+                    if (++start >= mid) {
+                        start += cnt;
+                        mid = start+cnt;
+                    }
+                } while (start+cnt < finish);
+            } while (cnt > 1);
+            
+            val = finish;
+            ascend = !ascend;
+        } while (val < n);
+    }
+    //This algorithm really only works for powers of two, so if it's not then...
+    if ((n&(n-1)) != 0) InsertionSort(a, n);
+}
+Natural Merge Sort:
+A different approach is to take advantage of and existing runs in the data, just like Strand sort did, and merge whatever runs happen to already be present in the sequence, rather than breaking it up into sequences at odd places. This is done by allocating extra memory twice the size of the original array. We logically split this extra memory into two buffers and are then free to dump runs of items in either buffer as appropriate. For every item from the input list that you examine, you copy the item into one of the output buffers according to the following rules:
+
+1. If both of the next items in the input buffers are larger than the last item added to the output buffer: Append the one with the larger top value, keeping the average of the top values as low as possible, giving maximum chance of being able to further extend the run with the next item added.
+2. If both of the next items in the input buffers are smaller than the last item added to the output buffer: Again, append it to the one with the larger top value, keeping the average of the top values as low as possible, making it more likely that the next item will be able to once again further extend the run.
+3. If one of the next items in the input buffers is less than the last item added to the output buffer, and the other is greater: Append the one with the larger top value because that extends the run length whereas appending the one from the other buffer would not. This is important because otherwise run lengths will not increase very quickly and the sort would actually become O(n2).
+
+Natural Merge Sort is NOT stable.
+
+[show source code]
+[hide source code]
+template <class T>
+void NaturalMerge(T *a, T *q[2], const int top[2]) {
+    int idx[2] = {0}, i = 0;
+    int dir = (q[1][0] < q[0][0]) ? 1 : 0;
+    a[i++] = q[dir][idx[dir]++];
+    // Copy items from the appropriate array until one reaches the end
+    while (idx[dir] < top[dir]) {
+        dir = (q[1][idx[1]] < q[0][idx[0]]) ? 1 : 0;
+        if (q[dir][idx[dir]] < a[i-1] && a[i-1] < q[1-dir][idx[1-dir]])
+            dir = 1-dir;
+        a[i++] = q[dir][idx[dir]++];
+    }
+    // Copy the leftover items from the other array
+    dir = 1-dir;
+    while (idx[dir] < top[dir]) {
+        a[i++] = q[dir][idx[dir]++];
+    }
+}
+
+template <class T>
+void NaturalMergeSort(T a[], int n) {
+    if (n < 2) return;
+    int idx[2], i;
+    T *q[2];
+    q[0] = new T[2 * n];
+    q[1] = &q[0][n];
+
+    for (;;) {
+        idx[0] = idx[1] = i = 0;
+        int half = 0;
+        // Distribute items into two arrays in such a way as to
+        // make the runs as long as possible
+        q[0][idx[0]++] = a[i++];
+        while (i < n) {
+            if (a[i] < q[half][idx[half]-1])
+                half = 1-half;
+            q[half][idx[half]++] = a[i++];
+        }
+        if (idx[1] == 0)
+            break;
+        NaturalMerge(a, q, idx);
+    }
+
+    delete[] q[0];
+}
+http://www.eternallyconfuzzled.com/tuts/algorithms/jsw_tut_sorting.aspx#merge
+
+Continue with more Array Sorting >
+
+ Download Mega Sorting Demo program (104933 bytes zip file)
+
+
+More Array Sorting
+by Malcolm Phillips
+
+< Back to other Array Sorting Techniques
+
+Tree Sort Techniques
+Binary Tree Sort:
+Well, Exchanging, Inserting and Merging techniques have already provided plenty to talk about. But wait, we're only just getting started! One conceptually easy way to sort items is to insert them into a binary tree, and then read out all the items using an in-order traversal. This is known, of course, as Tree sort. Beginners often mistake this for an O(n) sorting algorithm, because they fail to take into account two things:
+The tree grows as you insert more items, meaning that future inserts take longer, and
+The tree might degenerate into a linked-list, if for example, items are inserted in sorted order.
+It is in fact O(n2), but with some luck in the order items are inserted, it can run in O(nlogn) time.
+Tree Sort is stable.
+
+[show source code]
+[hide source code]
+template <class T>
+void BinaryTreeSort(T a[], int n) {
+    int idx = 0;
+    Node<T> *head = NULL, *const buf = new Node<T>[n];
+    for (int i = 0; i < n; ++i) {
+        buf[i].item = a[i];
+        TreeInsert(head, &buf[i]);
+    }
+    TreeDumpToArray(a, idx, head);
+    delete[] buf;
+}
+
+template <class T, class TNode>
+void TreeDumpToArray(T a[], int &idx, const TNode *node) {
+    while (node != NULL) {
+        TreeDumpToArray(a, idx, node->left);
+        a[idx++] = node->item;
+        node = node->right;
+    }
+}
+
+template <class T>
+struct Node {
+    Node *left, *right;
+    T item;
+    inline bool operator < (const Node &rhs) const { return item < rhs.item; }
+};
+http://en.wikipedia.org/wiki/Binary_tree_sort
+http://www.nist.gov/dads/HTML/treeSort.html
+
+Randomised Binary Tree Sort:
+The problem with Tree Sort is that the tree can be rather unbalanced, especially if the data was already sorted. Such a case would be really easy for many algorithms, but alas makes Tree Sort as bad (if not worse) than Insertion Sort. The fix is to use some kind of balanced tree. There are a number of self-balancing tree algorithms out there, or other means of ensuring a tree is reasonably well balanced.
+Although we know that tree sort performs poorly when there is a lot of order in the data, it performs reasonably well when the data is quite randomised. So we could either insert items in random order, or we could insert them into a randomised binary search tree. The approach I've taken here is the former.
+Randomised Binary Tree Sort is stable.
+
+[show source code]
+[hide source code]
+template <class T>
+void RandomisedBinaryTreeSort(T a[], int n) {
+    int idx = 0;
+    Node<T> *head = NULL, *const buf = new Node<T>[n];
+    Shuffle(a, n);
+    for (int i = 0; i < n; ++i) {
+        buf[i].item = a[i];
+        TreeInsert(head, &buf[i]);
+    }
+    TreeDumpToArray(a, idx, head);
+    delete[] buf;
+}
+http://www.cs.princeton.edu/~rs/strings/paper.pdf
+
+Splay Tree Sort / AVL Tree Sort / Red Black Tree Sort / AA (Anderson) Tree Sort / Scapegoat Tree Sort:
+Random insertion might be better than ordinary insertion, but it's still possible to have it perform poorly, however unlikely that may become. The principle for all balanced binary tree sorts is the same as for a normal binary tree sort except that they in turn employ other algorithms to keep the tree balanced, and some may require additional memory to do so. Here are a bunch of four common self-balancing tree sorting algorithms.
+Tree Sorts are stable.
+
+Splay Sort and Scapegoat Sort are of particular interest in that it doesn't require any extra variables on top of what is used in an ordinary tree sort. The others store extra data in each node. Splay Sort adapts extremely well to data containing various patterns, but other tree sorts give more uniform sort times. Actually when Splay-sorting a doubly-linked list, the previous and next pointers of the doubly-linked list can be reused as left and right nodes whilst in the tree, meaning that no extra memory is required for the sort.
+
+[show source code]
+[hide source code]
+template <class T>
+struct Node {
+    Node *left, *right;
+    T item;
+    inline bool operator < (const Node &rhs) const { return item < rhs.item; }
+};
+
+template <class T>
+void SplaySort(T a[], int n) {
+    int idx = 0;
+    Node<T> *head = NULL, *const buf = new Node<T>[n];
+    for (int i = 0; i < n; ++i) {
+        buf[i].item = a[i];
+        SplayTree::Insert(head, &buf[i]);
+    }
+    TreeDumpToArray(a, idx, head);
+    delete[] buf;
+}
+
+template <class T>
+struct AVLNode {
+    AVLNode *left, *right;
+    int bal;
+    T item;
+    inline bool operator < (const AVLNode &rhs) const { return item < rhs.item; }
+};
+
+template <class T>
+void AVLSort(T a[], int n) {
+    int idx = 0;
+    AVLNode<T> *head = NULL, *const buf = new AVLNode<T>[n];
+    for (int i = 0; i < n; ++i) {
+        buf[i].item = a[i];
+        AVLTree::Insert(head, &buf[i]);
+    }
+    TreeDumpToArray(a, idx, head);
+    delete[] buf;
+}
+
+template <class T>
+struct RBNode {
+    RBNode *left, *right;
+    bool red;
+    T item;
+    inline bool operator < (const RBNode &rhs) const { return item < rhs.item; }
+};
+
+template <class T>
+void RedBlackSort(T a[], int n) {
+    int idx = 0;
+    RBNode<T> *head = NULL, *const buf = new RBNode<T>[n];
+    for (int i = 0; i < n; ++i) {
+        buf[i].item = a[i];
+        RBTree::Insert(head, &buf[i]);
+    }
+    TreeDumpToArray(a, idx, head);
+    delete[] buf;
+}
+
+template <class T>
+struct AANode {
+    AANode *left, *right;
+    int level;
+    T item;
+    inline bool operator < (const AANode &rhs) const { return item < rhs.item; }
+};
+
+template <class T>
+void AASort(T a[], int n) {
+    int idx = 0;
+    AANode<T> *head = NULL, *const buf = new AANode<T>[n];
+    for (int i = 0; i < n; ++i) {
+        buf[i].item = a[i];
+        AATree::Insert(head, &buf[i]);
+    }
+    TreeDumpToArray(a, idx, head);
+    delete[] buf;
+}
+
+template <class T>
+void ScapegoatSort(T a[], int n) {
+    int idx = 0;
+    Node<T> *head = NULL, *const buf = new Node<T>[n];
+    for (int i = 0; i < n; ++i) {
+        buf[i].item = a[i];
+        ScapegoatTree::Insert(head, &buf[i], i);
+    }
+    TreeDumpToArray(a, idx, head);
+    delete[] buf;
+}
+http://en.wikipedia.org/wiki/Binary_tree_sort
+
+Heap Sort Techniques
+Heap Sort:
+
+
+A heap is a data structure designed to allow constant time access to the maximum item (or minimum, but not both), without using any extra memory. The problem with tree sorts is that the trees themselves take up a lot of memory. But hang on; we can store a tree implicitly in an array without the need for pointers or rebalancing. Here's how we do that:
+
+The first item is the root.
+The next two items are the children of the root.
+The next four items are the children of the root's two children.
+etc.
+
+Now the math to go between items and their parent's and children:
+
+First child = parent*2+1.
+Second child = parent*2+2.
+
+However we'll store items in the order of a heap rather than a tree, because an ordered tree wouldn't really help much. In a heap, the parent value is not between the values of its children (unlike an ordered binary tree). Instead, the parent is greater than either of its children (or small in a min-heap).
+Heap Sorts are NOT stable.
+
+[show source code]
+[hide source code]
+template <class T>
+void HeapSortDownHeap(T a[], int l, const int r) {
+    const T tempItem = a[l];
+    int child = (l<<1) + 1;
+    while (child < r) {
+        //use right child if it is bigger
+        if ((child + 1 < r) && (a[child] < a[child + 1]))
+            ++child;
+        if (!(tempItem < a[child]))
+            break;
+        a[l] = a[child];
+        l = child;
+        child = (child<<1) + 1;
+    }
+    a[l] = tempItem;
+}
+
+template <class T>
+void HeapSort(T a[], int n) {
+    //build heap
+    for (int i = n>>1; i >= 0; --i)
+        HeapSortDownHeap(a, i, n);
+    //extract max item successively
+    for (int j = n-1; j > 0; --j) {
+        Swap(a[0], a[j]);
+        HeapSortDownHeap(a, 0, j);
+    }
+}
+http://en.wikipedia.org/wiki/Heapsort
+http://www.nist.gov/dads/HTML/heapSort.html
+
+Fibonacci Heap Sort:
+Someone once had this crazy idea for nodes to have three children instead of two. To go to a child you multiply by 3 and add -1, 0 or 1. To go back to the parent, you add 1 then divide by 3. You need to start at 1 of course since 3 x 0 = 0. This modification adds a lot of complexity, but actually seems to give Fibonacci Heap Sort a speed advantage over regular Heap Sort.
+Heap Sorts are NOT stable.
+
+[show source code]
+[hide source code]
+#define FibonacciPartialDownheap(b, i, j) do{ \
+    int k = j-1; \
+    if (b[k] < b[j]) k = j; \
+    if (b[k] < b[j+1]) k = j+1; \
+    b[i] = b[k]; \
+    i = k; \
+    j = i * 3; \
+}while(false)
+
+#define FibonacciPartialUpheap(b, i, j) do{ \
+    b[i] = b[j]; \
+    i = j; \
+    j = (j+1) / 3; \
+}while(false)
+
+template <class T>
+while FibonacciHeapSort(T a[], int n) {
+    int i, j, l;
+    if (n > 4) { // Big enough For Split sorting
+        T *b = a-1;
+
+        //Build fibonacci heap
+        const int M = (n-1) / 3;
+        const int M1 = (M * 3) + 2;
+        if (M1 <= n) {
+            const int M2 = ((M1 < n) && (b[M1] < b[n])) ? n : M1;
+            if (b[1] < b[M2])
+                Swap(b[1], b[M2]); // Swap first element to M2
+        }
+
+        for (l = M; l > 0; --l) {
+            const T X = b[l];
+            i = l;
+            j = i * 3;
+            do {
+                FibonacciPartialDownheap(b, i, j);
+            } while (j <= M1);
+
+            j = (i+1) / 3;
+            do {
+                if (!(b[j] < X)) break;
+                FibonacciPartialUpheap(b, i, j);
+            } while (j >= l);
+            b[i] = X;
+        }
+
+        for (l = M1; l <= n; ++l) {
+            i = l;
+            j = (i+1) / 3;
+            if (b[j] < b[l]) {
+                T X = b[l];
+                do {
+                    FibonacciPartialUpheap(b, i, j);
+                } while (b[j] < X);
+                b[i] = X;
+            }
+        }
+
+        //Successively extract biggest item
+        l = n;
+        while (l > 4) {
+            const T X = b[l];
+            b[l] = b[1];
+            --l;
+            i = 1;
+            j = 3;
+            do {
+                FibonacciPartialDownheap(b, i, j);
+            } while (j < l);
+
+            if (--j <= l) {
+                if ((j < l) && (b[j] < b[l])) j = l;
+                b[i] = b[j];
+                i = j;
+            }
+
+            j = (i+1) / 3;
+            while (b[j] < X) {
+                FibonacciPartialUpheap(b, i, j);
+            }
+            b[i] = X;
+        }
+    }
+    InsertionSort(a, (n < 4) ? n : (int)4);
+}
+#undef FibonacciPartialDownheap
+#undef FibonacciPartialUpheap
+http://en.wikipedia.org/wiki/Fibonacci_heap
+
+Weak Heap Sort:
+Some speed gains can be made by relaxing the heap condition such that only right nodes need to be less than their parent. It does mean that we need to store an extra bit of info for each node though. This also tends to beat ordinary Heap Sort, but at the cost of using extra memory.
+Heap Sorts are NOT stable.
+
+[show source code]
+[hide source code]
+#define GETFLAG(r, x) ((r[(x)>>3] >> ((x)&7)) & 1)
+#define TOGGLEFLAG(r, x) (r[(x)>>3] ^= 1<<((x)&7))
+
+template <class T>
+while WeakHeapMerge(T a[], unsigned char *r, int i, int j) {
+    if (a[i] < a[j]) {
+        TOGGLEFLAG(r, j);
+        Swap(a[i], a[j]);
+    }
+}
+
+template <class T>
+while WeakHeapSort(T a[], int n) {
+    if (n > 1) {
+        int i, j, x, y, Gparent;
+        unsigned char *const r = new unsigned char[(n + 7) / 8)];
+        //clear external array
+        for (i=0; i<n/8; ++i) r[i] = 0;
+        //build weap-heap
+        for (i = n-1; i>0; --i) {
+            j = i;
+            while ((j & 1) == GETFLAG(r, j>>1)) j >>= 1;
+            Gparent = j>>1;
+            WeakHeapMerge(a, r, Gparent, i);
+        }
+        //extract max item successively
+        for (i = n-1; i>=2; --i) {
+            Swap(a[0], a[i]);
+            //mergeForest
+            x = 1;
+            while ((y = 2*x + GETFLAG(r, x)) < i) x = y;
+            while (x > 0) {
+                WeakHeapMerge(a, r, 0, x);
+                x >>= 1;
+            }
+        }
+        Swap(a[0], a[1]);
+        //cleanup
+        delete[] r;
+    }
+}
+#undef GETFLAG
+#undef TOGGLEFLAG
+http://www.nist.gov/dads/HTML/weakheapsort.html
+http://en.wikipedia.org/wiki/Heap_%28data_structure%29
+http://books.google.co.nz/books?id=4SHZRSV5emYC&pg=PA39&lpg=PA39&dq=Weak+Heap+Sort+algorithm&source=bl&ots=5ZMm9KiqHB&sig=I9rFijVOxajxrdet-4jfdRuP3ns&hl=en&ei=u9GjS-fFOZiekQWMzcXJCA&sa=X&oi=book_result&ct=result&resnum=9&ved=0CC4Q6AEwCA#v=onepage&q=Weak%20Heap%20Sort%20algorithm&f=false
+
+Smooth Sort:
+Dijkstra made a modification to Heap Sort which allowed it to run in O(n) time best case, for (almost) already sorted arrays. It's quite complex and slower than other heap sorting algorithms, much of the time. It is in fact too complex for me to describe here.
+Heap Sorts (of which this is one) are NOT stable.
+
+[show source code]
+[hide source code]
+#define SMOOTH_UP(b, c) do{ int oldb = b; b = b+c+1; c = oldb; }while(false)
+#define SMOOTH_DOWN(b, c) do{ int oldb = b; b = c; c = oldb-c-1; }while(false)
+template <class T>
+while sift(T a[], int r1, int b1, int c1) {
+    while (b1 >= 3) {
+        int r2 = r1-b1+c1;
+        if (a[r2] < a[r1-1]) {
+            r2 = r1-1;
+            SMOOTH_DOWN(b1, c1);
+        }
+        if (!(a[r1] < a[r2])) b1 = 1;
+        else {
+            Swap(a[r1], a[r2]);
+            r1 = r2;
+            SMOOTH_DOWN(b1, c1);
+        }
+    }
+}
+
+template <class T>
+while trinkle(T a[], int p1, int r1, int b1, int c1) {
+    while (p1 > 0) {
+        while ((p1 & 1) == 0) {
+            p1 >>= 1; SMOOTH_UP(b1, c1);
+        }
+        const int r3 = r1-b1;
+        if ((p1 == 1) || !(a[r1] < a[r3])) p1 = 0;
+        else {
+            --p1;
+            if (b1 == 1) {
+                Swap(a[r1], a[r3]);
+                r1 = r3;
+            } else if (b1 >= 3) {
+                int r2 = r1-b1+c1;
+                if (a[r2] < a[r1-1]) {
+                    r2 = r1-1;
+                    SMOOTH_DOWN(b1, c1);
+                    p1 <<= 1;
+                }
+                if (!(a[r3] < a[r2])) {
+                    Swap(a[r1], a[r3]);
+                    r1 = r3;
+                } else {
+                    Swap(a[r1], a[r2]);
+                    r1 = r2;
+                    SMOOTH_DOWN(b1, c1);
+                    p1 = 0;
+                }
+            }
+        }
+    }
+    sift(a, r1, b1, c1);
+}
+
+template <class T>
+while semitrinkle(T a[], int p, int r, int b, int c) {
+    const int r1 = r-c;
+    if (a[r] < a[r1]) {
+        Swap(a[r], a[r1]);
+        trinkle(a, p, r1, b, c);
+    }
+}
+
+template <class T>
+while SmoothSort(T a[], int n) {
+    int q=1, r=0, p=1, b=1, c=1;
+    
+    while (q < n) {
+        if ((p & 7) == 3) {
+            sift(a, r, b, c);
+            p = (p+1)>>2;
+            SMOOTH_UP(b, c); SMOOTH_UP(b, c);
+        } else if ((p & 3) == 1) {
+            if (q+c < n)
+                sift(a, r, b, c);
+            else
+                trinkle(a, p, r, b, c);
+            do {
+                SMOOTH_DOWN(b, c); p <<= 1;
+            } while (b != 1);
+            ++p;
+        }
+        ++q; ++r;
+    }
+    trinkle(a, p, r, b, c);
+    while (q > 1) {
+        --q;
+        if (b == 1) {
+            --r; --p;
+            while ((p & 1) == 0) {
+                p >>= 1;
+                SMOOTH_UP(b, c);
+            }
+        } else if (b >= 3) {
+            r += c-b;
+            --p;
+            if (p > 0) semitrinkle(a, p, r, b, c);
+            SMOOTH_DOWN(b, c); p = 2*p+1;
+            r += c;
+            semitrinkle(a, p, r, b, c);
+            SMOOTH_DOWN(b, c); p = 2*p+1;
+        }
+    }
+}
+#undef SMOOTH_UP
+#undef SMOOTH_DOWN 
+http://en.wikipedia.org/wiki/Smoothsort
+http://www.nist.gov/dads/HTML/smoothsort.html
+
+Beap Sort:
+Beap is short for "Bi-Parental Heap". In a beap, nodes have two children, and two parents. Other than that it is quite similar to a heap, and the algorithm itself is also very similar. Adjacent nodes share a child and a parent. This forms more of a grid structure as opposed to a tree structure. It has no practical usage due to being far less efficient than a binary heap. I've only really implemented it out of curiosity. Operations tend to take O(sqrt(n)) time. The sort itself is O(n1.5).
+Beap Sort is NOT stable.
+
+[show source code]
+[hide source code]
+template <class T>
+while BeapSortDownHeap(T a[], int l, const int r, int level) {
+    const T tempItem = a[l];
+    int child = l + level;
+    while (child < r) {
+        if ((child + 1 < r) && (a[child] < a[child+1]))
+            ++child;
+        if (!(tempItem < a[child]))
+            break;
+        a[l] = a[child];
+        l = child;
+        child += ++level;
+    }
+    a[l] = tempItem;
+}
+
+template <class T>
+while BeapSort(T a[], int n) {
+    //calculate number of levels
+    int sum = 0, level = 0;
+    while (sum < n)
+        sum += ++level;
+    sum -= level--;
+    //build beap
+    for (int i=sum; i >= 0; --i) {
+        if (i < sum)
+            sum -= level--;
+        BeapSortDownHeap(a, i, n, level);
+    }    
+    //extract max item successively
+    for (int j=n-1; j > 0; --j) {
+        Swap(a[0], a[j]);
+        BeapSortDownHeap(a, 0, j, 1);
+    }
+}
+http://en.wikipedia.org/wiki/Beap
+
+Quick Sort Techniques
+Quick Sort:
+
+
+A quick way to sort items is to pick one of them and divide the rest into two partitions, one with items less than the item picked, and one with items greater than the item picked. Then you do the same with each partition, and finally join the splitter and the sorted partitions together. This is one of the many algorithms that uses what is known as the divide and conquer approach. The problem is divided into smaller sub-tasks, each of which is divided again in the same manner until the problem becomes trivial (there is only one item). The easiest way to pick a splitter is to pick the first item, however that is a horrible choice for when the list is already sorted or reverse sorted, as might often be the case. A fairly good and quick method is to pick the middle item of the array, which is what is done here.
+Quick Sorts are NOT stable.
+
+[show source code]
+[hide source code]
+#define CUTOFF 16
+
+template <class T>
+while QuickSortAux(T a[], int l, int r) {
+    while (r - l > CUTOFF) {
+        int i = l-1, j = r;
+        //pick middle item as splitter
+        const T tempItem = a[(l+r)>>1];
+        //partition items
+        for (;;) {
+            do ++i; while (a[i] < tempItem);
+            do --j; while (tempItem < a[j]);
+            if (j <= i) break;
+            Swap(a[i], a[j]);
+        }
+        if (i-l <= r-i) {
+            QuickSortAux(a, l, i);
+            l = i;
+        } else {
+            QuickSortAux(a, i, r);
+            r = i;
+        }
+    }
+}
+
+template <class T>
+while QuickSort(T a[], int n) {
+    QuickSortAux(a, 0, n);
+#if CUTOFF > 1
+    InsertionSort(a, n);
+#endif
+}
+http://en.wikipedia.org/wiki/Quicksort
+http://www.nist.gov/dads/HTML/quicksort.html
+http://www.iti.fh-flensburg.de/lang/algorithmen/sortieren/quick/quicken.htm
+http://www.sorting-algorithms.com/quick-sort
+
+Randomised Quick Sort:
+Whilst the inner loop which partitions the items in two runs very fast, unfortunately picking the first item can have bad consequences. If the array is already sorted then one of the partitions will contain all of the remaining items, meaning that each partitioning step only reduces the workload by one, and performance becomes terrible. Picking the middle item can be just as bad depending on the order of the data. This can be improved in several ways. First off, you can try picking a random splitter. That way you'd have to be very unlucky to pick a very bad splitter many times over. Quick Sorts are NOT stable.
+
+[show source code]
+[hide source code]
+#define CUTOFF 16
+
+template <class T>
+while RandomisedQuickSortAux(T a[], int l, int r, long &holdrand) {
+    while (r - l > CUTOFF) {
+        //pick a random item as splitter
+        int randNo = (((holdrand = holdrand * 214013L + 2531011L) >> 16) & 0x7fff);
+        int i = l-1, j = r;
+        const T tempItem = a[l + randNo%(r-l)];
+        //partition items
+        for (;;) {
+            do ++i; while (a[i] < tempItem);
+            do --j; while (tempItem < a[j]);
+            if (j <= i) break;
+            Swap(a[i], a[j]);
+        }
+        if (i-l <= r-i) {
+            RandomisedQuickSortAux(a, l, i, holdrand);
+            l = i;
+        } else {
+            RandomisedQuickSortAux(a, i, r, holdrand);
+            r = i;
+        }
+    }
+}
+
+template <class T>
+while RandomisedQuickSort(T a[], int n) {
+    long defaultSeed = DEFAULT_SEED;
+    RandomisedQuickSortAux(a, 0, n, defaultSeed);
+#if CUTOFF > 1
+    InsertionSort(a, n);
+#endif
+}
+http://en.wikipedia.org/wiki/Quicksort#Randomized_quicksort_expected_complexity
+
+Median-of-Three Quick Sort:
+Some people might not be too keen on using a random splitter. You never know when it might perform badly one time, yet quickly the next, sorting exactly the same sequence. Also with picking the middle item, you can still get poor results every now and then. A better alternative is to sample a few items and then pick the middle (median) value. This generally gives very good results, and makes hitting the worst case extremely unlikely. Quick Sorts are NOT stable.
+
+[show source code]
+[hide source code]
+#define CUTOFF 16
+
+template <class T>
+while MedianOf3QuickSortAux(T a[], int l, int r) {
+    while (r - l > CUTOFF) {
+        int i = (l+r)>>1, j = r-1;
+        //pick median of 3 items as splitter
+        if (a[i] < a[l]) Swap(a[i], a[l]);
+        if (a[j] < a[l]) Swap(a[j], a[l]);
+        if (a[j] < a[i]) Swap(a[j], a[i]);
+        const T tempItem = a[i];
+        i = l;
+        //partition items
+        for (;;) {
+            do ++i; while (a[i] < tempItem);
+            do --j; while (tempItem < a[j]);
+            if (j <= i) break;
+            Swap(a[i], a[j]);
+        }
+        if (i-l <= r-i) {
+            MedianOf3QuickSortAux(a, l, i);
+            l = i;
+        } else {
+            MedianOf3QuickSortAux(a, i, r);
+            r = i;
+        }
+    }
+}
+
+template <class T>
+while MedianOf3QuickSort(T a[], int n) {
+    MedianOf3QuickSortAux(a, 0, n);
+#if CUTOFF > 1
+    InsertionSort(a, n);
+#endif
+}
+http://en.wikipedia.org/wiki/Quicksort
+http://www.people.carleton.edu/~grossm/
+
+Mean Sort:
+The key to good Quick Sort performance really is in picking good splitter values. If we're prepared to spend a little time to first look at all the values, then we can find a close to ideal splitter. All we need is to find the minimum and maximum value and pick halfway between, thus using an artificial cut-off value. This is what I have called as Mean Sort. The drawback, besides having to iterate over the array first, is that it assumes that the distribution of the items is roughly linear. If it is not, then this wont work well.
+Mean Sort is NOT stable.
+
+[show source code]
+[hide source code]
+#define CUTOFF 16
+
+template <class T>
+while MeanSortAux(T a[], int l, int r, int lo, int hi) {
+    if (r - l > CUTOFF) {
+        while (hi - lo > 1) {
+            int i = l-1, j=r;
+            const int mid = (lo+hi)>>1;
+            //partition items
+            for (;;) {
+                do ++i; while (i < j && a[i]-a[0] <= mid);
+                do --j; while (i < j && a[j]-a[0] > mid);
+                if (j <= i) break;
+                Swap(a[i], a[j]);
+            }
+            if (i-l <= r-i) {
+                MeanSortAux(a, l, i, lo, mid);
+                l = i; lo = mid;
+            } else {
+                MeanSortAux(a, i, r, mid, hi);
+                r = i; hi = mid;
+            }
+        }
+    }
+}
+
+template <class T>
+while MeanSort(T a[], int n) {
+    if (n > 1) {
+        int min=0, max=0;
+        for (int i=1; i<n; ++i) {
+            if (a[i] < a[min]) min = i;
+            else if (a[max] < a[i]) max = i;
+        }
+        const int range = int(a[max] - a[min]) + 1;
+        if (range > 0) {
+            Swap(a[0], a[min]);
+            MeanSortAux(a, 1, n, 0, range);
+        }
+    }
+#if CUTOFF > 1
+    InsertionSort(a, n);
+#endif
+}
+Proportion Extend Sort:
+The main problem with Quick Sort is when the chosen splitter is not close to placing half of the items on either side. In this algorithm the median technique is again used, however the median is chosen from more than 3 items. In order to pick the median of more than three items, you have to select m items, and then sort those items and choose the one in the middle. This brings us back to the original problem of sorting some number of items, in order to do that. Since we're picking a median from a smaller number of items than we actually want to sort overall, we do the logical thing of using a recursive call. So in order to pick the median we first have to pick the median of a smaller number of items, and to do that we may have to pick the median of an even smaller number of items etc. Typically the number of items m for picking the mean is n/16. This algorithm therefore has three logical recursive calls (I always convert the last one to iterative, for performance). However since it is likely to pick a better median than the median-of-three technique, it can actually perform faster.
+Proportion-Extend Sort is NOT stable.
+
+[show source code]
+[hide source code]
+template <class T>
+int Partition(T a[], int mid, int u1, int u2) {
+    //divide list into two halves of those items less than
+    //and those items greater than 'mid'.
+    int i=u1, j=u2;
+    for (;;) {
+        while (i <= j && !(a[mid] < a[i])) ++i;
+        while (i < j && !(a[j] < a[mid])) --j;
+        if (i >= j) break;
+        Swap(a[i], a[j]);
+        ++i; --j;
+    }
+    //return point between the new lists
+    return i;
+}
+
+template <class T>
+while ProportionExtendSortAux(T a[], int s1, int s2, int ua2) {
+    int i, prop, mid, /*se1, */se2, sl2, sr1, sr2, u1, u2, /*ue2, */ul2, ur1;
+    const int p=16;
+    if (s2 < s1) s2 = s1;
+
+    while (s2 < ua2) {
+        prop = (1+p)*(s2-s1+1);
+        se2 = (p*prop > ua2-s1+1) ? ua2 : s1 + prop - 1;
+
+        mid = (s1+s2) >> 1;
+        u1 = s2+1;
+        u2 = se2;
+        sl2 = mid-1;
+        ur1 = Partition(a, mid, u1, u2);
+        sr1 = ur1-(s2-mid);
+        sr2 = ur1-1;
+        ul2 = sr1-2;
+
+        for (i=0; i<=s2-mid; ++i)
+            Swap(a[s2-i], a[sr2-i]);
+
+        if (ul2-sl2 < u2-sr2) {
+            ProportionExtendSortAux(a, s1, sl2, ul2);
+            ProportionExtendSortAux(a, sr1, sr2, u2);
+        } else {
+            ProportionExtendSortAux(a, sr1, sr2, u2);
+            ProportionExtendSortAux(a, s1, sl2, ul2);
+        }
+        s2 = se2;
+    }
+}
+
+template <class T>
+while ProportionExtendSort(T a[], int n) {
+    ProportionExtendSortAux(a, 0, 0, n-1);
+}
+http://epubs.siam.org/SICOMP/volume-31/art_34290.html
+
+Introspective Sort:
+Unfortunately it's still possible to get crappy performance, just extremely unlikely. One can modify Quick Sort to monitor the recursion depth and if it gets too deep, switch to Heap Sort. Heap Sort is not quite as fast as Quick Sort most of the time, but is much faster than Quick Sort when it comes to the worst case. This change guarantees that it will never take far too long. Quick sort variants also often only sort until the items are approximately in order, and at the end a final pass with insertion sort is done. This ends up being faster than letting Quick sort mess around with the fiddly little unsorted portions. So this algorithm is a blend of 3 others!
+Intro Sort is NOT stable because it uses Quick Sort and Heap Sort internally, which are not stable, even though it also uses Insertion Sort which is stable.
+
+[show source code]
+[hide source code]
+#define CUTOFF 16
+
+template <class T>
+while IntroSortAux(T a[], int l, int r, int depth_limit) {
+    while (r - l > CUTOFF) {
+        if (depth_limit == 0) {
+            //tending towards quadratic operation so fall back to heapsort
+            HeapSort(&a[l], r - l);
+            return;
+        }
+        --depth_limit;
+        int i = (l+r)>>1, j = r-1;
+        if (a[i] < a[l]) Swap(a[i], a[l]);
+        if (a[j] < a[l]) Swap(a[j], a[l]);
+        if (a[j] < a[i]) Swap(a[j], a[i]);
+        const T tempItem = a[i];
+        i = l;
+        //partition items
+        for (;;) {
+            do ++i; while (a[i] < tempItem);
+            do --j; while (tempItem < a[j]);
+            if (j <= i) break;
+            Swap(a[i], a[j]);
+        }
+        if (i-l <= r-i) {
+            IntroSortAux(a, l, i, depth_limit);
+            l = i;
+        } else {
+            IntroSortAux(a, i, r, depth_limit);
+            r = i;
+        }
+    }
+}
+
+template <class T>
+while IntroSort(T a[], int n) {
+    IntroSortAux(a, 0, n, lg(n)*2);
+#if CUTOFF > 1
+    InsertionSort(a, n);
+#endif
+}
+http://www.cs.rpi.edu/~musser/gp/introsort.ps
+
+Oddball Techniques
+Shear Sort
+This algorithm treats the input array as it it were a two-dimensional i * j (grid) of items rather than a one dimensional array of n items. This works alright when n can be factorised into approximately equal factors. The nature of the algorithm also means that it can run well on multiple process or cores at once. However it works terribly when n is prime.
+Shear Sort is NOT stable.
+
+[show source code]
+[hide source code]
+template <class T>
+while ShearSortAux(T a[], const int Lo, const int Hi, const int Nx, bool ascend) {
+    for (int j = Lo; j+Nx<Hi; j+=2*Nx)
+        if (ascend == a[j+Nx] < a[j])
+            Swap(a[j], a[j+Nx]);
+}
+
+template <class T>
+while ShearSort(T a[], int n) {
+    int pow=1, Rows=1, Log, i, j, k;
+    //Factorise n into Rows and Cols (worst case n is prime)
+    for (i = 1; i*i <= n; ++i)
+        if (n % i == 0) Rows = i;
+    const int Cols = n / Rows;
+    for (Log = 0; pow <= Rows; ++Log) pow<<=1;
+    for (k = 0; k < Log; ++k) {
+        //Sort rows alternately descending then ascending (by odd-even transposition)
+        for (j = 0; j<(Cols+1)>>1; ++j) {
+            for (i = 0; i<Rows; ++i)
+                ShearSortAux(a, i*Cols, (i+1)*Cols, 1, (i&1)==0);
+            for (i = 0; i<Rows; ++i)
+                ShearSortAux(a, i*Cols+1, (i+1)*Cols, 1, (i&1)==0);
+        }
+        //Sort all columns ascending (by odd-even transposition)
+        for (j = 0; j<(Rows+1)>>1; ++j) {
+            for (i = 0; i<Cols; ++i)
+                ShearSortAux(a, i, n+i, Cols, true);
+            for (i = 0; i<Cols; ++i)
+                ShearSortAux(a, i+Cols, n+i, Cols, true);
+        }
+    }
+
+    //Sort all rows ascending (by odd-even transposition)
+    for (j = 0; j<(Cols+1)>>1; ++j) {
+        for (i = 0; i<Rows; ++i)
+            ShearSortAux(a, i*Cols, (i+1)*Cols, 1, true);
+        for (i = 0; i<Rows; ++i)
+            ShearSortAux(a, i*Cols+1, (i+1)*Cols, 1, true);
+    }
+}
+http://www.cs.rit.edu/~atk/Java/Sorting/sorting.html
+
+Optimistic Sort
+This algorithm is a simple fixed network of n*logn compare-exchange operations, which when repeated at most logn times produces a sorted array. I dreamt this up on 13th April 2007. It can't realistically compete with Quick Sorts average case, but is on par with Bitonic Sort algorithms in terms of Big-Oh notation. However this algorithm can finish in fewer than logn passes, in which case it beats Bitonic Sort. The lower bound is O(nlogn) and the upper bound is O(nlog2n).
+Each pass is very simple. Perform a compare and swap of items from the first half with the second half. Do this by starting from each end and proceeding towards the middle. Compare and swap the items from each location as you go, swapping if out or order. Repeat on each half, until the there is only 1 item. This often does not in itself fully sort the items, and usually more passes are needed.
+It does guarantee that the smallest and largest items find their way to the correct positions in one pass, however. It also unexpectedly seems to be the case that after each compete pass, there are no strictly decreasing runs of length three or greater.
+Care must be taken to deal with the middle item wherever the portion to sort is not an even size. The middle item must be compared to another item so that it too is allowed to move.
+Although this algorithm is so far not quite competitive with techniques such as quicksort, I encourage others to explore the idea further as it may have some usefulness when combined with merging, or perhaps a final insertion sort pass. If this algorithm can be made more adaptive it may indeed one day become competitive with quicksort. I certainly believe there is more potential for speed gains here.
+This algorithm is NOT stable.
+
+As far as I am aware, this algorithm is my own creation. Therefore I do not yet have any links to other sites with the algorithm.
+
+[show source code]
+[hide source code]
+template <class T>
+void OptimisticSortAux(T a[], int l, int r, bool &swapped) {
+    while (r - l > 1) {
+        int i = l, j = r;
+        do {
+            --j;
+            if (a[j] < a[i]) {
+                Swap(a[i], a[j]);
+                swapped = true;
+            }
+            ++i;
+        } while (i < j);
+        // If there were an odd number of items,
+        // we may need to move the middle one
+        if (i > j) {
+            if (a[i] < a[j]) {
+                Swap(a[i], a[j]);
+                swapped = true;
+            }
+        }
+        OptimisticSortAux(a, l, i, swapped);
+        l = i;
+    }
+}
+
+template <class T>
+void OptimisticSort(T a[], int n) {
+    bool swapped;
+    do {
+        swapped = false;
+        OptimisticSortAux(a, 0, n, swapped);
+    } while (swapped);
+}
+Squeeze Sort
+This algorithm is in some ways similar to Strand Sort, except that the runs are not obtained from consecutive items. The runs are instead obtained by scanning through the array looking for items that can extend the run in either direction. This starts with the first item in the array each time, and builds the longest run it can from there, by examining every item in order. In the process, the unsorted items are moved over to fill up the gap where each item taken for the run was. The run, which is stored in a secondary buffer, is then merged with the sorted portion after each pass, and put back into the original array where space was made for it when items were moved over earlier.
+This algorithm is NOT stable.
+[show source code]
+[hide source code]
+template <class T>
+void SqueezeMerge(T a[], T sorted[], int &sorted_so_far, int unsorted_so_far, int start, int end, int n) {
+    /*This function merges the newly found sorted sequence 
+    (sorted [start: n-1] and sorted [sorted_so_far: end-1] together consecutively) 
+    with the existing sorted array item sorted [0: sorted_so_far ], 
+    thus increasing the number of sorted elements. */
+
+    int h = 0, j = start, i = unsorted_so_far;
+    int mid = sorted_so_far;
+
+    while (h < mid) {
+        if (!(sorted[j] < sorted[h])) 
+            a[i++] = sorted[h++];
+        else { 
+            a[i++] = sorted[j++];
+            if (j == n) j = mid;
+            if (j == end) break;
+        }
+    }
+
+    if (h >= mid) {
+        for (int k=j;;) {
+            a[i++] = sorted[k++];
+            if (k == n) k = mid;
+            if (k == end) break;
+        }
+    } else {
+        for (int k=h; k<=mid-1;) {
+            a[i++] = sorted[k++];
+        }
+    }
+
+    sorted_so_far = 0;
+    for (int k = unsorted_so_far; k<n; ++k)
+        sorted[sorted_so_far++] = a[k];
+}
+
+template <class T, class int>
+void SqueezeSortAux(T a[], T sorted[], int sorted_so_far, int n, int realn) {
+    int unsorted_so_far;
+    do {
+        int start = realn, end = sorted_so_far;
+        T max = a[0], min = a[0];
+        unsorted_so_far = 0;
+
+        for (int i=0; i < n; ++i) {
+            if (!(min < a[i])) 
+                sorted[--start] = min = a[i];
+            else if (max < a[i]) 
+                sorted[end++] = max = a[i];
+            else 
+                a[unsorted_so_far++] = a[i];
+        }
+        SqueezeMerge(a, sorted, sorted_so_far, unsorted_so_far, start, end, realn);
+
+        n = unsorted_so_far;
+    } while (unsorted_so_far > 0);
+}
+
+template <class T, class int>
+void SqueezeSort(T a[], int n) {
+    if (n > 1) {
+        T *sorted = new T[n];
+        SqueezeSortAux(a, sorted, 0, n, n);
+        delete[] sorted;
+    }
+}
+http://www.codeproject.com/useritems/SQ_Srt_New.asp
+http://www.articleboy.com/Article/Squeeze-Sort--A-New-Sorting-Technique/1188 
+
+Non-Comparison-Based Sort Techniques
+Flash Sort:
+
+
+All of the algorithms so far are comparison-based, and as such cannot do better than O (nlogn) running time. To do any better we need to compare keys in a more useful manner than simply determining which of two is bigger. We can take advantage of extra information, such as the difference between the keys to get a much better idea of how far apart they should be. Once we find the lowest and the highest items, we can work out approximately where the other items should go, by the relative distance of their keys. This is the principle behind Flash Sort. As with Mean Sort, this algorithm works best when the distribution of values is roughly linear.
+Flash Sort allows a great degree of control with regards to the memory-usage/speed tradeoff. In the following implementation I have pinned the minimum and maximum memory usage as well.
+Flash Sort is NOT stable.
+
+[show source code]
+[hide source code]
+template <class T>
+while FlashSort(T a[], int n) {
+    const int THRESHOLD = 64; // insertion sort cut-off
+    const int MIN_CLASS_SIZE = 32; // minimum value for m
+    const int MAX_CLASS_SIZE = 16384; // maximum value for m
+    const int AVERAGE_BUCKET_SIZE = 10; // memory/speed trade off
+
+    int nmin, nmax, i, j, k, nmove, nx;
+
+    // class formation
+    if (n <= 1) return;
+    nmin = nmax = 0;
+    for (i=1; i < n; ++i) {
+        if (a[i] < a[nmin])
+            nmin = i;
+        else if (a[nmax] < a[i])
+            nmax = i;
+    }
+
+    if (!(a[nmin] < a[nmax])) return; //all the numbers are identical, the list is sorted
+
+    int m = n/AVERAGE_BUCKET_SIZE;
+    if (m < MIN_CLASS_SIZE) m = MIN_CLASS_SIZE;
+    else if (m > MAX_CLASS_SIZE) m = MAX_CLASS_SIZE;
+    // allocate space for the l vector
+    int *l = new int[m];
+
+    const double c1 = (double)(m-1.0)/(a[nmax]-a[nmin]);
+    const T c2 = a[nmin];
+
+    l[0] = -1; // since the base of the "a" (data) array is 0
+    for (k=1; k < m; ++k) l[k] = 0;
+    for (i=0; i < n; ++i) {
+        k = static_cast<int>(floor(c1*(a[i]-c2)));
+        ++l[k];
+    }
+    for (k=1; k < m; ++k) l[k] += l[k-1];
+
+    Swap(a[0], a[nmax]);
+
+    // permutation
+    nmove = j = 0;
+    k = m-1;
+
+    while (nmove < n) {
+        while (j > l[k]) {
+            ++j;
+            k = static_cast<int>(floor(c1*(a[j]-c2)));
+        }
+
+        T flash = a[j];
+
+        while (j <= l[k]) {
+            k = static_cast<int>(floor(c1*(flash-c2)));
+            const int lk = l[k];
+            const T hold = a[ lk ];
+            a[ lk ] = flash;
+            --l[k];
+            flash = hold;
+            ++nmove;
+        }
+    }
+
+    // choice of recursion or straight insertion
+    for (k = 0; k < (m-1); ++k) {
+        if ( (nx = l[k+1]-l[k]) > THRESHOLD ) // then use recursion
+            FlashSort(&a[l[k]+1], nx);
+
+        else {// use insertion sort
+            for (i=l[k+1]-1; i > l[k]; --i) {
+                if (a[i+1] < a[i]) {
+                    const T hold = a[i];
+                    j = i;
+                    do {
+                        a[j] = a[j+1];
+                        ++j;
+                    } while (a[j+1] < hold);
+                    a[j] = hold;
+                }
+            }
+        }
+    }
+    //cleanup
+    delete[] l;
+}
+http://www.neubert.net/FSOIntro.html
+http://www.nist.gov/dads/HTML/flashsort.html
+
+Radix Sort:
+One can go even further towards extracting more information from the keys. Going beyond subtracting keys as in Flash Sort, you can actually sort by the exact bytes of the key, one at a time, or by some other number of bits of the key at once. This technique is not very general as it can't work for every type of data, and typically requires modifications for each data type you wish to use it on. As it sorts according to the least-significant bits first, the internal algorithm used "Counting Sort" is required to be a stable algorithm. Counting Sort is so data-specific that I don't bother with it at all.
+The great news is that unlike Flash Sort, this is not affected by non-linear distributions.
+Radix Sort is stable.
+
+[show source code]
+[hide source code]
+template <class T>
+const int NUM_BITS_AT_ONCE = 8;
+const int MAX_BIN = (1<<NUM_BITS_AT_ONCE);
+const bool SIGNEDVALUES = false;
+template <class T>
+while RadixSort(T a[], int n) {
+    if (n > 1) {
+        int histogram[MAX_BIN], i, val = 0;
+        int shift, mask;
+        int *idx1, *idx2, *idx3, *const l = new int[2 * n];
+        idx1 = &l[0]; idx2 = &l[n];
+        //setup initial order
+        for (i=0; i<n; ++i)
+            idx1[i] = i;
+        for (shift=0; shift<32; shift+=NUM_BITS_AT_ONCE) {
+            //clear histogram
+            for (i=MAX_BIN; i>0;)
+                histogram[--i] = 0;
+            //calculate histogram
+            for (i=n; i>0;) {
+                val = (a[--i]>>shift) & (MAX_BIN-1);
+                ++histogram[val];
+            }
+            if (histogram[val] == n) continue;
+            //change to cumulative
+            if (SIGNEDVALUES && shift+NUM_BITS_AT_ONCE>=32) {
+                //swap halves of table for signed
+                mask = (MAX_BIN>>1);
+                for (i=1; i<MAX_BIN; ++i)
+                    histogram[i^mask] += histogram[(i-1)^mask];
+            } else {
+                for (i=1; i<MAX_BIN; ++i)
+                    histogram[i] += histogram[i-1];
+            }
+            //perform sort
+            for (i=n; i>0;) {
+                const int thisIndex = idx1[--i];
+                val = (a[thisIndex]>>shift) & (MAX_BIN-1);
+                idx2[--histogram[val]] = thisIndex;
+            }
+            //swap index lists
+            idx3 = idx1; idx1 = idx2; idx2 = idx3;
+        }
+        //reorder items to match index list, requiring only 1 temporary item
+        ReorderAccordingTo(a, n, idx1);
+        //clean up
+        delete[] l;
+    }
+}
+
+while ReorderAccordingTo(T a[], int n, int indexes[]) {
+    // Reorder items to match index list, requiring only 1 temporary item
+    for (int i=0; i<n; ++i) {
+     if (indexes[i] != i) { //check if item is in place
+            const T tempItem = a[i];
+            int l = i, j;
+            while ((j = indexes[l]) != i) {
+                a[l] = a[j];
+                indexes[l] = l;
+                l = j;
+            }
+            a[l] = tempItem;
+            indexes[l] = l;
+        }
+    }
+}
+http://en.wikipedia.org/wiki/Radix_sort
+http://www.nist.gov/dads/HTML/radixsort.html
+
+Unfeasible Sort Techniques
+Gnome Sort:
+Well, now that we've reached the fastest sorting algorithms, let take a look at some of the slowest.
+Gnome Sort is extremely simple. Compare an item with its neighbour, if it is out of order, swap them and move back (not past the start), otherwise move forward. Stop when you reach the end. This actually works basically like Insertion Sort, but less efficiently.
+This algorithm is O(n2), but is stable.
+
+[show source code]
+[hide source code]
+template <class T >
+void GnomeSort(T a[], int n) {
+    int i = 0;
+    while (i < n) {
+        if (i != 0 && a[i] < a[i-1]) {
+            Swap(a[i], a[i-1]);
+            --i;
+        } else {
+            ++i;
+        }
+    }
+}
+http://en.wikipedia.org/wiki/Gnome_sort
+http://www.nist.gov/dads/HTML/gnomeSort.html
+
+Stupid Sort:
+Can we do worse than Gnome Sort? Sure, go back to the start after finding items out of order and swapping them. This algorithm is so bad that it is O(n3), but it is stable.
+
+[show source code]
+[hide source code]
+template <class T>
+void StupidSort(T a[], int n) {
+    int i = 0;
+    while (i < n-1) {
+        ++i;
+        if (a[i] < a[i-1]) {
+            Swap(a[i-1], a[i]);
+            i = 0;
+        }
+    }
+}
+Stooge Sort:
+
+
+Here's a bazaar idea. Can we sort with no loop whatsoever? Sure buy using the powers of recursion we can develop Stooge Sort. This algorithm is so bad that it is O(n2.7)
+Stooge Sort is NOT stable.
+
+[show source code]
+[hide source code]
+template <class T>
+void StoogeSortAux(T a[], int l, int r) {
+    if (a[r-1] < a[l]) Swap(a[l], a[r-1]);
+    if (r - l > 2) {
+        const int third = (r-l)/3;
+        StoogeSortAux(a, l, r-third);
+        StoogeSortAux(a, l+third, r);
+        StoogeSortAux(a, l, r-third);
+    }
+}
+template <class T>
+void StoogeSort(T a[], int n) {
+    if (n > 1) StoogeSortAux(a, 0, n);
+}
+http://en.wikipedia.org/wiki/Stooge_sort
+http://www.nist.gov/dads/HTML/stoogesort.html
+
+Fib Sort:
+Just as Stooge Sort has no loop, neither does Fib Sort. The running time of this algorithm with n items, relates to the nth Fibonacci number, hence the name.
+Fib Sort is NOT stable.
+
+[show source code]
+[hide source code]
+template <class T>
+void FibSort(T a[], int n) {
+    if (n <= 1)
+        return;
+    if (a[n-1] < a[0])
+        Swap(a[0], a[n-1]);
+    FibSort(&a[1], n-2);
+    if (a[1] < a[0])
+        Swap(a[0], a[1]);
+    FibSort(&a[1], n-1);
+}
+http://www.ics.uci.edu/~eppstein/161/exams/mt1.pdf
+
+Slow Sort:
+Okay, now things just get really insane. This algorithm containing 3 recursive calls is actually designed to be as innocently looking and yet as inefficient as possible. Hey, if you can¡¯t design the fastest algorithm, why not go for the slowest! This algorithm manages to be about as bad as O(n(logn)/2) even though on the surface it appears to contain code similar to Stooge Sort. The authors (Andrei Broder & Jorge Stolfi) don't mention this at all, but this sort is NOT stable.
+
+[show source code]
+[hide source code]
+template <class T>
+void SlowSort(T a[], int n) {
+    SlowSortAux(a, 0, n-1, n-1);
+}
+
+template <class T>
+void SlowSortAux(T a[], int i, int j, int n) {
+    if (i < j) {
+        //Multiply and Surrender
+        int m = (i + j) >> 1;
+        SlowSortAux(a, i, m, n);
+        SlowSortAux(a, m+1, n, n);
+        if (a[j] < a[m])
+            Swap(a[m], a[j]);
+        SlowSortAux(a, i, j-1, n);
+    }
+}
+http://www.cs.uiuc.edu/class/fa05/cs473ug/resources/pessimal-algorithms.pdf
+http://de.wikipedia.org/wiki/Slowsort 
+
+Perm Sort:
+Hmm, can we get any slower than Slow Sort? You bet! We can try every permutation of the items until we find a match. The number of permutations gets ridiculously high very quickly, and this algorithm swaps items like crazy, so you'll probably literally grow old waiting for it, but what the heck. What's more it uses a lot of stack space
+This worst-case algorithm is O(n*n!) and it is NOT stable either.
+
+[show source code]
+[hide source code]
+template <class T>
+bool PermSortAux(T a[], int n, int i) {
+    if (Sorted(a, n)) return true;
+    //Compute every permutation recursively
+    int j = i+1;
+    if (j < n) {
+        const T x1 = a[i];
+        do {
+            a[i] = a[j];
+            a[j] = x1;
+            if (PermSortAux(a, n, i+1)) return true;
+            a[j] = a[i];
+            a[i] = x1;
+        } while (++j < n);
+        //try this item in it's original place as well
+        if (PermSortAux(a, n, i+1)) return true;
+    }
+    return false;
+}
+
+template <class T>
+while PermSort(T a[], int n) {
+    PermSortAux(a, n, 0);
+}
+http://cg.scs.carleton.ca/~morin/misc/sortalg/
+
+Bozo Sort:
+In Bozo Sort, we just swap items randomly until the whole lot just happen to be in sorted order. As you can imagine, the chance of it even succeeding aren't that great, and if it does, it most likely isn't going to be quick.
+Bozo Sort is NOT stable.
+
+[show source code]
+[hide source code]
+#define DEFAULT_SEED 0x9e3779b9
+
+template <class T>
+while BozoSort(T a[], int n) {
+    BozoSortAux(a, n, DEFAULT_SEED);
+}
+
+template <class T>
+while BozoSortAux(T a[], int n, long seed) {
+    long holdrand = seed;
+    while (!Sorted(a, n)) {
+        //generate two random numbers (local generator)
+        unsigned int randNo1 = (((holdrand = holdrand * 214013L + 2531011L) >> 16) & 0x7fff);
+        unsigned int randNo2 = (((holdrand = holdrand * 214013L + 2531011L) >> 16) & 0x7fff);
+        //pick two random items
+        const int pos1 = randNo1 % n;
+        const int pos2 = randNo2 % n;
+        //now swap them
+        Swap(a[pos1], a[pos2]);
+    }
+}
+
+template <class T>
+bool Sorted(const T a[], int n) {
+    //if any item is less than its predecessor then return false
+    for (int i = n-1; i > 0; --i)
+        if (a[i] < a[i-1])
+            return false;
+    return true;
+}
+http://en.wikipedia.org/wiki/Bozo_sort
+
+On To List Sorting >
+
+ Download Mega Sorting Demo program (104933 bytes zip file)

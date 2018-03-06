@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1502005360 source:/home/pi/Academy/10clang/_codeblocks/Running/main.c
+	<stdio.h>
+	<stdlib.h>
+
+1501987271 source:/home/pi/Academy/10clang/_codeblocks/Running/static_extern.c
+	<stdio.h>
+
