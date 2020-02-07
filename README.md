@@ -16,5 +16,3 @@ http://www.kernel.bz/product/12
 http://www.e4ds.com/webinar_keyseminar.asp
 
 소스를 수정 및 개선한 사항은 정재준(rgbi3307@nate.com)에게 이메일 주시기 바랍니다.
-
-Last Updated: 2018-03-06
