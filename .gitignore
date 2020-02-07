@@ -33,3 +33,5 @@
 
 # Codeblocks
 _codeblocks/
+*.layout
+*.workspace
